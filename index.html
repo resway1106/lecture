@@ -68,10 +68,10 @@
     margin-bottom: 18px;
   }
   .brand-logo {
-    width: 56px; height: 56px;
-    border-radius: 50%;
+    width: 64px; height: 64px;
+    border-radius: 14px;
     background: #fff;
-    padding: 6px;
+    padding: 8px;
     box-shadow: 0 4px 14px rgba(0,0,0,0.18);
     object-fit: contain;
     flex-shrink: 0;
@@ -622,7 +622,7 @@
   <div class="container header-content">
     <div class="brand-row">
       <img src="logo.png" alt="奇美醫院 教學部" class="brand-logo" />
-      <span class="header-badge">奇美醫院 · 教學部</span>
+      <span class="header-badge">教學部</span>
     </div>
     <h1 id="page-title">奇美醫院 全院演講</h1>
     <p class="subtitle" id="page-subtitle">Hospital-Wide Lecture Series</p>
@@ -918,7 +918,7 @@ function renderYearTabs() {
 
 function selectYear(y) {
   currentYear = y;
-  $("page-subtitle").textContent = `${y} 年度 · Hospital-Wide Lecture Series`;
+  $("page-subtitle").textContent = `Hospital-Wide Lecture Series`;
   $("meta-updated").textContent = `更新日期：${SCHEDULE[y].updated}`;
   document.querySelectorAll(".year-tab").forEach(b => {
     b.classList.toggle("active", Number(b.dataset.year) === y);
