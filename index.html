@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>全院教學活動時間表</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --primary: #0a6b7c;
+    --primary-dark: #064b58;
+    --primary-light: #e6f4f7;
+    --accent: #d97757;
+    --accent-light: #fdf0eb;
+    --warn: #c2410c;
+    --highlight: #fef3c7;
+    --highlight-text: #92400e;
+    --gray-50: #fafaf9;
+    --gray-100: #f5f5f4;
+    --gray-200: #e7e5e4;
+    --gray-300: #d6d3d1;
+    --gray-500: #78716c;
+    --gray-700: #44403c;
+    --gray-900: #1c1917;
+    --cancel-bg: #fee2e2;
+    --cancel-text: #991b1b;
+    --holiday-bg: #fef3c7;
+    --holiday-text: #92400e;
+    --tba-bg: #f3f4f6;
+    --tba-text: #6b7280;
+  }
+  body {
+    font-family: 'Noto Sans TC', system-ui, -apple-system, "Microsoft JhengHei", sans-serif;
+    background: linear-gradient(135deg, #f0f9fb 0%, #fdf6f1 100%);
+    color: var(--gray-900);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: #fff;
+    padding: 40px 0 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: ""; position: absolute; top: -50px; right: -50px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  header::after {
+    content: ""; position: absolute; bottom: -100px; left: -50px;
+    width: 250px; height: 250px;
+    background: radial-gradient(circle, rgba(217,119,87,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .header-content { position: relative; z-index: 1; }
+  .header-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    padding: 6px 16px; border-radius: 20px;
+    font-size: 13px; font-weight: 500;
+    margin-bottom: 16px; letter-spacing: 0.5px;
+  }
+  h1 {
+    font-size: clamp(26px, 4vw, 40px); font-weight: 900;
+    letter-spacing: 1px; margin-bottom: 10px;
+  }
+  .subtitle { font-size: 15px; opacity: 0.9; font-weight: 300; margin-bottom: 22px; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 22px; font-size: 14px; }
+  .meta-item { display: flex; align-items: center; gap: 8px; opacity: 0.95; }
+  .meta-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* Year tabs */
+  .year-tabs {
+    display: flex; gap: 8px; margin-top: 22px;
+    flex-wrap: wrap;
+  }
+  .year-tab {
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.85);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    padding: 8px 20px; border-radius: 24px;
+    font-size: 14px; font-weight: 600;
+    font-family: inherit; cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .year-tab:hover { background: rgba(255,255,255,0.2); color: #fff; }
+  .year-tab.active {
+    background: #fff; color: var(--primary-dark);
+    border-color: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .year-tab .pill {
+    background: rgba(0,0,0,0.08); color: inherit;
+    padding: 1px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 500;
+  }
+  .year-tab.active .pill { background: var(--primary-light); color: var(--primary-dark); }
+  .year-tab.tba { opacity: 0.7; }
+
+  /* Spotlight */
+  .spotlight {
+    background: linear-gradient(135deg, #fff7e6 0%, #fef3c7 100%);
+    border-radius: 16px;
+    padding: 28px;
+    margin-top: -48px;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 10px 40px rgba(217, 119, 87, 0.15);
+    border: 1px solid #fde68a;
+  }
+  .spotlight-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px; flex-wrap: wrap; gap: 10px;
+  }
+  .spotlight-title {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 17px; font-weight: 700; color: var(--highlight-text);
+  }
+  .spotlight-pulse {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent); position: relative;
+  }
+  .spotlight-pulse::after {
+    content: ""; position: absolute; inset: -4px;
+    border-radius: 50%; border: 2px solid var(--accent);
+    animation: pulse 1.6s ease-out infinite; opacity: 0;
+  }
+  @keyframes pulse {
+    0% { transform: scale(0.8); opacity: 1; }
+    100% { transform: scale(1.8); opacity: 0; }
+  }
+  .spotlight-meta {
+    font-size: 13px; color: var(--highlight-text);
+    opacity: 0.85;
+  }
+  .spotlight-meta strong { font-weight: 700; }
+  .spotlight-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .spotlight-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+  }
+  .spot-card {
+    background: #fff; border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #fde68a;
+    transition: all 0.25s;
+    display: flex; flex-direction: column;
+  }
+  .spot-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(217, 119, 87, 0.22);
+  }
+  /* 海報區 — 5:7 直式比例（接近 A4 = √2 比例，最佳化奇美演講海報展示） */
+  .spot-poster-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 5 / 7;
+    background: linear-gradient(135deg, #fef9c3 0%, #fde68a 100%);
+    overflow: hidden;
+  }
+  .spot-poster-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block; cursor: zoom-in;
+    transition: transform 0.35s;
+  }
+  .spot-card:hover .spot-poster-img { transform: scale(1.04); }
+  /* 沒有上傳實體海報時，自動產生的「文字版海報」 */
+  .spot-poster-placeholder {
+    position: absolute; inset: 0;
+    padding: 22px 20px;
+    display: flex; flex-direction: column;
+    color: var(--highlight-text);
+    background: linear-gradient(135deg, #fef9c3 0%, #fde68a 60%, #fcd34d 100%);
+  }
+  .spot-ph-date {
+    font-size: 13px; font-weight: 700;
+    margin-bottom: 10px; padding-bottom: 10px;
+    border-bottom: 1px solid rgba(146, 64, 14, 0.25);
+  }
+  .spot-ph-topic {
+    font-size: 17px; font-weight: 800;
+    line-height: 1.4; margin: auto 0;
+    word-break: break-word;
+  }
+  .spot-ph-speaker {
+    font-size: 12.5px; font-weight: 500;
+    opacity: 0.8; line-height: 1.5;
+    margin-top: 12px; padding-top: 12px;
+    border-top: 1px dashed rgba(146, 64, 14, 0.3);
+  }
+  .spot-ph-tag {
+    position: absolute; bottom: 14px; right: 14px;
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(4px);
+    padding: 3px 10px; border-radius: 10px;
+    font-size: 10.5px; font-weight: 600;
+    color: var(--highlight-text); opacity: 0.85;
+  }
+  /* 卡片底部資訊條 */
+  .spot-card-foot {
+    padding: 10px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; background: #fffaf0;
+    border-top: 1px solid #fde68a;
+  }
+  .spot-card-when {
+    font-size: 12.5px; font-weight: 600;
+    color: var(--warn); line-height: 1.35;
+  }
+  .spot-card-when .urgent { color: #b91c1c; font-weight: 700; }
+  .btn-ics-sm {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--accent-light); color: var(--warn);
+    border: 1px solid #fce2d3;
+    padding: 6px 12px; border-radius: 8px;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .btn-ics-sm:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-ics-sm svg { width: 12px; height: 12px; }
+
+  /* 海報放大檢視 (Lightbox) */
+  .lightbox {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 1000;
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+    display: flex; align-items: center; justify-content: center;
+    padding: 30px; cursor: zoom-out;
+  }
+  .lightbox.show { opacity: 1; visibility: visible; }
+  .lightbox img {
+    max-width: 100%; max-height: 100%;
+    object-fit: contain; border-radius: 6px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .lightbox-close {
+    position: absolute; top: 20px; right: 24px;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    color: #fff; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .lightbox-close:hover { background: rgba(255,255,255,0.25); }
+  .lightbox-close svg { width: 22px; height: 22px; }
+  .lightbox-hint {
+    position: absolute; bottom: 24px; left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.6);
+    font-size: 12px; letter-spacing: 0.5px;
+  }
+  .spotlight-empty {
+    text-align: center; padding: 20px;
+    color: var(--highlight-text); opacity: 0.8;
+    font-size: 14px;
+  }
+
+  /* Filter card */
+  .filter-card {
+    background: #fff; border-radius: 16px;
+    padding: 24px 28px; margin-bottom: 28px;
+    box-shadow: 0 4px 16px rgba(10, 107, 124, 0.08);
+    border: 1px solid var(--gray-100);
+  }
+  .filter-title {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 15px; font-weight: 600;
+    color: var(--primary-dark); margin-bottom: 16px;
+  }
+  .filter-title svg { width: 18px; height: 18px; }
+  .filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 14px;
+  }
+  .filter-field { display: flex; flex-direction: column; gap: 6px; }
+  .filter-field label {
+    font-size: 12px; font-weight: 600;
+    color: var(--gray-700); letter-spacing: 0.3px;
+  }
+  .filter-field input, .filter-field select {
+    padding: 10px 12px; border: 1.5px solid var(--gray-200);
+    border-radius: 8px; font-size: 14px; font-family: inherit;
+    background: var(--gray-50); transition: all 0.2s;
+    color: var(--gray-900);
+  }
+  .filter-field input:focus, .filter-field select:focus {
+    outline: none; border-color: var(--primary);
+    background: #fff;
+    box-shadow: 0 0 0 3px var(--primary-light);
+  }
+  .filter-actions {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 18px; padding-top: 18px;
+    border-top: 1px dashed var(--gray-200);
+    flex-wrap: wrap; gap: 12px;
+  }
+  .result-count { font-size: 14px; color: var(--gray-500); }
+  .result-count strong {
+    color: var(--primary); font-size: 18px;
+    font-weight: 700; margin: 0 2px;
+  }
+  .toggle-row {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .toggle-row label {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--gray-700);
+    cursor: pointer; user-select: none;
+  }
+  .toggle-row input[type="checkbox"] { accent-color: var(--primary); }
+  .btn-clear, .btn-batch {
+    border: none; padding: 8px 16px; border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-clear { background: var(--gray-100); color: var(--gray-700); }
+  .btn-clear:hover { background: var(--gray-200); }
+  .btn-batch {
+    background: var(--primary); color: #fff;
+  }
+  .btn-batch:hover { background: var(--primary-dark); }
+  .btn-batch svg, .btn-clear svg { width: 14px; height: 14px; }
+
+  /* Course cards */
+  .course-list {
+    display: flex; flex-direction: column; gap: 16px;
+    margin-bottom: 40px;
+  }
+  .course-card {
+    background: #fff; border-radius: 14px;
+    padding: 20px 24px;
+    display: grid; grid-template-columns: 96px 1fr auto;
+    gap: 22px; align-items: start;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid var(--gray-100);
+    transition: all 0.2s;
+  }
+  .course-card:hover {
+    box-shadow: 0 8px 24px rgba(10, 107, 124, 0.1);
+    transform: translateY(-1px);
+    border-color: var(--primary-light);
+  }
+  .course-card.is-upcoming {
+    border-color: #fde68a;
+    background: linear-gradient(to right, #fffbf3 0%, #fff 70%);
+  }
+  .date-block {
+    text-align: center; background: var(--primary-light);
+    border-radius: 10px; padding: 14px 8px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .course-card.is-upcoming .date-block {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+  }
+  .course-card.is-upcoming .date-month,
+  .course-card.is-upcoming .date-day,
+  .course-card.is-upcoming .date-weekday { color: var(--highlight-text); }
+  .date-day {
+    font-size: 28px; font-weight: 900;
+    color: var(--primary-dark); line-height: 1;
+  }
+  .date-month {
+    font-size: 12px; font-weight: 600;
+    color: var(--primary); margin-bottom: 4px; letter-spacing: 0.5px;
+  }
+  .date-weekday {
+    font-size: 12px; color: var(--primary);
+    margin-top: 6px; font-weight: 500;
+  }
+
+  /* 月份配色 — 12 個月各自的底色，避開 holiday/cancel/upcoming 保留色 */
+  .date-block[data-month="1"]  { background: #e0e7ff; }
+  .date-block[data-month="1"] .date-month,
+  .date-block[data-month="1"] .date-day,
+  .date-block[data-month="1"] .date-weekday  { color: #3730a3; }
+
+  .date-block[data-month="2"]  { background: #fce7f3; }
+  .date-block[data-month="2"] .date-month,
+  .date-block[data-month="2"] .date-day,
+  .date-block[data-month="2"] .date-weekday  { color: #9d174d; }
+
+  .date-block[data-month="3"]  { background: #d1fae5; }
+  .date-block[data-month="3"] .date-month,
+  .date-block[data-month="3"] .date-day,
+  .date-block[data-month="3"] .date-weekday  { color: #065f46; }
+
+  .date-block[data-month="4"]  { background: #ecfccb; }
+  .date-block[data-month="4"] .date-month,
+  .date-block[data-month="4"] .date-day,
+  .date-block[data-month="4"] .date-weekday  { color: #4d7c0f; }
+
+  .date-block[data-month="5"]  { background: #e0f2fe; }
+  .date-block[data-month="5"] .date-month,
+  .date-block[data-month="5"] .date-day,
+  .date-block[data-month="5"] .date-weekday  { color: #075985; }
+
+  .date-block[data-month="6"]  { background: #cffafe; }
+  .date-block[data-month="6"] .date-month,
+  .date-block[data-month="6"] .date-day,
+  .date-block[data-month="6"] .date-weekday  { color: #155e75; }
+
+  .date-block[data-month="7"]  { background: #dbeafe; }
+  .date-block[data-month="7"] .date-month,
+  .date-block[data-month="7"] .date-day,
+  .date-block[data-month="7"] .date-weekday  { color: #1e40af; }
+
+  .date-block[data-month="8"]  { background: #ede9fe; }
+  .date-block[data-month="8"] .date-month,
+  .date-block[data-month="8"] .date-day,
+  .date-block[data-month="8"] .date-weekday  { color: #5b21b6; }
+
+  .date-block[data-month="9"]  { background: #fae8ff; }
+  .date-block[data-month="9"] .date-month,
+  .date-block[data-month="9"] .date-day,
+  .date-block[data-month="9"] .date-weekday  { color: #86198f; }
+
+  .date-block[data-month="10"] { background: #ffedd5; }
+  .date-block[data-month="10"] .date-month,
+  .date-block[data-month="10"] .date-day,
+  .date-block[data-month="10"] .date-weekday { color: #9a3412; }
+
+  .date-block[data-month="11"] { background: #ccfbf1; }
+  .date-block[data-month="11"] .date-month,
+  .date-block[data-month="11"] .date-day,
+  .date-block[data-month="11"] .date-weekday { color: #115e59; }
+
+  .date-block[data-month="12"] { background: #e2e8f0; }
+  .date-block[data-month="12"] .date-month,
+  .date-block[data-month="12"] .date-day,
+  .date-block[data-month="12"] .date-weekday { color: #334155; }
+  .course-body { display: flex; flex-direction: column; gap: 10px; }
+  .course-topic {
+    font-size: 18px; font-weight: 700;
+    color: var(--gray-900); line-height: 1.4;
+  }
+  .course-info {
+    display: flex; flex-wrap: wrap; gap: 18px;
+    font-size: 14px; color: var(--gray-700);
+  }
+  .info-item { display: flex; align-items: flex-start; gap: 6px; }
+  .info-label { color: var(--gray-500); font-size: 13px; flex-shrink: 0; }
+  .info-value { font-weight: 500; }
+  .credit-tags {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;
+  }
+  .credit-tag {
+    background: var(--accent-light); color: var(--warn);
+    padding: 3px 10px; border-radius: 12px;
+    font-size: 12px; font-weight: 500;
+    border: 1px solid #fce2d3;
+  }
+  .credit-detail {
+    font-size: 12.5px; color: var(--gray-500); line-height: 1.7;
+    padding-top: 8px; border-top: 1px dashed var(--gray-200);
+    margin-top: 4px;
+  }
+  .credit-detail-line { display: block; }
+  .course-actions {
+    display: flex; flex-direction: column; gap: 8px;
+    align-self: start;
+  }
+  .btn-ics {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--primary-light); color: var(--primary-dark);
+    border: 1.5px solid #b6dde5;
+    padding: 8px 14px; border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .btn-ics:hover {
+    background: var(--primary); color: #fff;
+    border-color: var(--primary);
+    transform: translateY(-1px);
+  }
+  .btn-ics svg { width: 14px; height: 14px; }
+
+  /* Status variants */
+  .course-card.status-cancelled .date-block { background: var(--cancel-bg); }
+  .course-card.status-cancelled .date-day,
+  .course-card.status-cancelled .date-month,
+  .course-card.status-cancelled .date-weekday { color: var(--cancel-text); }
+  .course-card.status-cancelled .course-topic {
+    color: var(--cancel-text); text-decoration: line-through;
+  }
+  .course-card.status-cancelled { opacity: 0.75; }
+  .course-card.status-cancelled .btn-ics { display: none; }
+
+  .course-card.status-holiday .date-block { background: var(--holiday-bg); }
+  .course-card.status-holiday .date-day,
+  .course-card.status-holiday .date-month,
+  .course-card.status-holiday .date-weekday { color: var(--holiday-text); }
+  .course-card.status-holiday .course-topic { color: var(--holiday-text); }
+  .course-card.status-holiday { opacity: 0.85; }
+  .course-card.status-holiday .btn-ics { display: none; }
+
+  .course-card.status-tba .date-block { background: var(--tba-bg); }
+  .course-card.status-tba .date-day,
+  .course-card.status-tba .date-month,
+  .course-card.status-tba .date-weekday { color: var(--tba-text); }
+  .course-card.status-tba .course-topic {
+    color: var(--tba-text); font-style: italic;
+  }
+
+  .status-badge {
+    display: inline-block; padding: 2px 10px; border-radius: 12px;
+    font-size: 12px; font-weight: 600;
+    margin-left: 8px; vertical-align: middle;
+  }
+  .badge-cancelled { background: var(--cancel-bg); color: var(--cancel-text); }
+  .badge-holiday { background: var(--holiday-bg); color: var(--holiday-text); }
+  .badge-tba { background: var(--tba-bg); color: var(--tba-text); }
+  .badge-special { background: #ede9fe; color: #5b21b6; }
+  .badge-current {
+    background: var(--accent); color: #fff;
+    padding: 2px 10px;
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center; padding: 60px 20px;
+    color: var(--gray-500);
+  }
+  .empty-state svg {
+    width: 64px; height: 64px;
+    opacity: 0.4; margin-bottom: 16px;
+  }
+  .year-placeholder {
+    background: #fff; border-radius: 14px;
+    padding: 60px 20px; text-align: center;
+    border: 2px dashed var(--gray-200);
+    color: var(--gray-500);
+  }
+  .year-placeholder h3 {
+    font-size: 18px; color: var(--gray-700);
+    margin-bottom: 8px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 32px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--gray-900); color: #fff;
+    padding: 12px 24px; border-radius: 50px;
+    font-size: 14px; font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    z-index: 100; opacity: 0;
+    transition: all 0.3s ease;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .toast.show {
+    opacity: 1; transform: translateX(-50%) translateY(0);
+  }
+  .toast svg { width: 16px; height: 16px; color: #86efac; }
+
+  /* Footer */
+  footer {
+    text-align: center; padding: 32px 0 40px;
+    font-size: 13px; color: var(--gray-500);
+    border-top: 1px solid var(--gray-200);
+    background: rgba(255,255,255,0.5);
+  }
+
+  @media (max-width: 640px) {
+    header { padding: 28px 0 64px; }
+    .spotlight { padding: 20px; margin-top: -36px; }
+    .filter-card { padding: 18px; }
+    .course-card {
+      grid-template-columns: 72px 1fr; padding: 16px; gap: 14px;
+    }
+    .course-actions {
+      grid-column: 1 / -1; flex-direction: row;
+      padding-top: 10px;
+      border-top: 1px dashed var(--gray-200);
+    }
+    .date-day { font-size: 22px; }
+    .course-topic { font-size: 16px; }
+    .course-info { gap: 10px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container header-content">
+    <span class="header-badge">📚 醫學教育中心</span>
+    <h1 id="page-title">全院教學活動時間表</h1>
+    <p class="subtitle">Annual Hospital-Wide Teaching Programs</p>
+    <div class="meta-row">
+      <div class="meta-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>07:30 – 08:30</span>
+      </div>
+      <div class="meta-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <span>第五醫療大樓五樓 國際會議廳</span>
+      </div>
+      <div class="meta-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        <span id="meta-updated">更新日期：—</span>
+      </div>
+    </div>
+    <div class="year-tabs" id="year-tabs"></div>
+  </div>
+</header>
+
+<div class="container">
+
+  <section class="spotlight" id="spotlight" style="display:none">
+    <div class="spotlight-head">
+      <div class="spotlight-title">
+        <span class="spotlight-pulse"></span>
+        <span id="spotlight-title">本月主打</span>
+      </div>
+      <div class="spotlight-meta" id="spotlight-meta"></div>
+    </div>
+    <div class="spotlight-cards" id="spotlight-cards"></div>
+  </section>
+
+  <div class="filter-card" id="filter-card">
+    <div class="filter-title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+      <span>篩選條件</span>
+    </div>
+    <div class="filter-grid">
+      <div class="filter-field">
+        <label for="f-month">月份</label>
+        <select id="f-month">
+          <option value="">全部月份</option>
+          <option value="1">1月</option><option value="2">2月</option>
+          <option value="3">3月</option><option value="4">4月</option>
+          <option value="5">5月</option><option value="6">6月</option>
+          <option value="7">7月</option><option value="8">8月</option>
+          <option value="9">9月</option><option value="10">10月</option>
+          <option value="11">11月</option><option value="12">12月</option>
+        </select>
+      </div>
+      <div class="filter-field">
+        <label for="f-speaker">講師</label>
+        <input id="f-speaker" type="text" placeholder="輸入講師姓名或單位…" autocomplete="off" />
+      </div>
+      <div class="filter-field">
+        <label for="f-topic">主題關鍵字</label>
+        <input id="f-topic" type="text" placeholder="例如：倫理、AI、CPC…" autocomplete="off" />
+      </div>
+      <div class="filter-field">
+        <label for="f-credit">學分類別</label>
+        <select id="f-credit">
+          <option value="">全部學分</option>
+          <option value="專業">繼續教育 — 專業</option>
+          <option value="品質">繼續教育 — 品質</option>
+          <option value="倫理">繼續教育 — 倫理</option>
+          <option value="性別">繼續教育 — 倫理／性別</option>
+          <option value="六大核心">CFD B類六大核心</option>
+          <option value="進階">CFD 進階</option>
+          <option value="生理">CFD Aa類生理</option>
+          <option value="健康促進">CFD Ab類健康促進</option>
+          <option value="醫學人文">CFD Ac類醫學人文</option>
+          <option value="安寧">CFD Ad類安寧</option>
+          <option value="社會、長照">CFD Ad類社會長照</option>
+          <option value="倫理及法律">CFD D類倫理及法律</option>
+          <option value="CFD 核心">CFD 核心課程（點數）</option>
+          <option value="CFD 一般">CFD 一般課程（點數）</option>
+          <option value="醫學倫理">員工 — 醫學倫理</option>
+          <option value="全人醫療">員工 — 全人醫療</option>
+          <option value="醫療品質">員工 — 醫療品質</option>
+          <option value="緩和醫療">員工 — 緩和醫療</option>
+          <option value="健康識能">員工 — 健康識能</option>
+          <option value="醫療相關法規">員工 — 醫療相關法規</option>
+          <option value="領導統御">主管培育 — 領導統御</option>
+        </select>
+      </div>
+    </div>
+    <div class="filter-actions">
+      <div class="result-count">
+        共顯示 <strong id="count">0</strong> 筆課程
+      </div>
+      <div class="toggle-row">
+        <label><input type="checkbox" id="hide-inactive" /> 隱藏取消／休假／待定</label>
+        <button class="btn-clear" id="btn-clear" title="清除所有篩選條件">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          清除篩選
+        </button>
+        <button class="btn-batch" id="btn-batch" title="將目前篩選的所有課程加入行事曆">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          一鍵加入全部
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="course-list" class="course-list"></div>
+  <div id="year-placeholder" class="year-placeholder" style="display:none">
+    <h3 id="placeholder-title">本年度尚未公告</h3>
+    <p id="placeholder-text">課程資訊將陸續公布，敬請期待。</p>
+  </div>
+  <div id="empty" class="empty-state" style="display:none">
+    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    <p>找不到符合條件的課程，試試其他關鍵字。</p>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+  <span id="toast-msg">已加入行事曆</span>
+</div>
+
+<!-- 海報放大檢視 -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="海報放大檢視">
+  <button class="lightbox-close" id="lightbox-close" aria-label="關閉">
+    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+  </button>
+  <img id="lightbox-img" src="" alt="" />
+  <div class="lightbox-hint">點任意處或按 Esc 關閉</div>
+</div>
+
+<footer>
+  <div class="container">
+    <p>奇美醫療財團法人奇美醫院 醫學教育中心 · 全院教學活動公告</p>
+  </div>
+</footer>
+
+<script>
+/* =========================================================
+ * 課程資料 — 依年度組織。未來年度只要新增一個 key (e.g. 116)
+ * 即會自動出現年度切換 tab。
+ * ========================================================= */
+const SCHEDULE = {
+  115: {
+    adYear: 2026,
+    updated: "115.06.02",
+    location: "第五醫療大樓五樓國際會議廳",
+    timeStart: "07:30",
+    timeEnd: "08:30",
+    courses: [
+      { date:"1/16", weekday:"五", topic:"住院醫師論文評選", speaker:"神經外科 陳昱廷醫師／麻醉部 黃郁珺醫師／放射腫瘤部 周宛萱醫師／神經內科 蔡穩穩醫師／神經外科 葉小菡醫師", host:"陳志偉主任", tags:["六大核心","進階","CFD 核心"], details:["臨床教師認證 B 類「六大核心」與「進階」各 1 學分","CFD 核心課程 10 點、科部外教學績效積分"], special:"住院醫師論文評選" },
+      { date:"1/29", weekday:"四", topic:"EV+P Strategy to achieve Complete and Durable Responses with optimal treatment duration and how German RWD supports clinical decisions", speaker:"Dr. Jozefina Casuscelli（德國慕尼黑大學醫院 LMU Klinikum 泌尿腫瘤診療中心主任）", host:"黃冠華副部長／馮盈勳主任", tags:["專業","生理","CFD 一般"], details:["醫師及專師「專業」繼續教育學分 1.2 分","臨床教師認證 Aa 類「生理」1 學分","CFD 一般課程 5 點、科部外教學績效積分"] },
+      { date:"2/06", weekday:"五", status:"cancelled" },
+      { date:"2/11", weekday:"三", status:"cancelled" },
+      { date:"2/17", weekday:"二", status:"holiday", note:"適逢春節，暫停乙次" },
+      { date:"3/06", weekday:"五", status:"cancelled" },
+      { date:"3/11", weekday:"三", status:"cancelled" },
+      { date:"3/20", weekday:"五", topic:"Engineering Hope with Bioelectronic Medicine", speaker:"劉文泰教授（加州大學洛杉磯分校）", host:"湯宏仁副院長", tags:["品質","專業","生理","CFD 一般"], details:["醫師「品質」、專師「專業」繼續教育學分 1.2 分","臨床教師認證 Aa 類「生理」1 學分","CFD 一般課程 5 點、科部外教學績效積分"] },
+      { date:"3/27", weekday:"五", topic:"Cardio-Oncology — the application of medical AI", speaker:"NG CHOON TA（The National Heart Center Singapore）", host:"張瑋婷主任", tags:["專業","生理","CFD 一般"], details:["醫師及專師「專業」繼續教育學分 1.2 分","臨床教師認證 Aa 類「生理」1 學分","CFD 一般課程 5 點、科部外教學績效積分"], note:"地點：561 會議室", location:"561 會議室" },
+      { date:"4/03", weekday:"五", status:"holiday", note:"兒童節補假，暫停乙次" },
+      { date:"4/07", weekday:"二", topic:"臨床倫理討論會", speaker:"一般內科 黃琪雅醫師", host:"郭妍伶主任", tags:["倫理","倫理及法律","CFD 核心","醫學倫理"], details:["醫師、專師繼續教育「倫理」學分 1.2 分","CFD 核心學分 10 分、科部外教學績效學分","臨床教師認證 D 類『倫理及法律』 1 學分","員工教育訓練「醫學倫理」1 學分"] },
+      { date:"4/10", weekday:"五", topic:"我對奇美醫學中心的感謝及期許", speaker:"邱文祥教授（新光吳火獅紀念醫院執行長暨客座教授／奇美醫院 院務顧問）", host:"黃冠華副部長", tags:["品質","醫學人文","CFD 核心","全人醫療"], details:["醫師、專師繼續教育「品質」學分 1.2 分","CFD 核心學分 10 分、科部外教學績效學分","臨床教師認證 Ac 類『醫學人文』 1 學分","員工教育訓練「全人醫療」1 學分"] },
+      { date:"4/15", weekday:"三", topic:"與政策和健保新制同行", speaker:"李孟智教授（衛生福利部臺中醫院顧問醫師／特聘講座教授）", host:"黃建元總監", tags:["品質","六大核心","CFD 核心"], details:["醫師、專師繼續教育「品質」學分 1.2 分","CFD 核心學分 10 分","科部外教學績效學分","臨床教師認證 B 類『六大核心能力』 1 學分"] },
+      { date:"5/01", weekday:"五", status:"holiday", note:"勞動節，暫停乙次" },
+      { date:"5/05", weekday:"二", topic:"從「用藥任性」到「藥物韌性」", speaker:"陳喬松 資深副總經理(台灣東洋藥品工業股份有限公司)", host:"李健逢部長", tags:["專業","倫理","六大核心","CFD 核心"], details:["醫師「專業」、專師「倫理」繼續教育學分 1.2 分","CFD 核心學分 10 分、科部外教學績效學分","臨床教師認證 B 類『六大核心能力』 1 學分"] },
+      { date:"5/13", weekday:"三", topic:"以價值為導向的醫療照護模式發展與實踐", speaker:"陳星助副院長（花蓮慈濟醫院）", host:"深耕計畫辦公室 黃仲毅執行長", tags:["品質","六大核心","CFD 核心","醫療品質","領導統御"], details:["醫師、專師繼續教育「品質」學分 1.2 分","臨床教師認證 B 類「六大核心」1 學分","CFD 核心課程 10 點、科部外教學績效積分","員工教育訓練「醫療品質」1 學分","主管培育「領導統御」1 學分"] },
+      { date:"5/15", weekday:"五", topic:"從今天開始，對抗退化的科學訓練", speaker:"何立安博士（怪獸肌力及體能訓練中心 創辦人）", host:"蔡孟修主任", tags:["品質","健康促進","CFD 核心","健康識能"], details:["醫師、專師繼續教育「品質」學分 1.2 分","CFD 核心學分 10 分、科部外教學績效學分","臨床教師認證 A 類 b『健康促進』 1 學分","員工教育訓練「健康識能」1 學分"] },
+      { date:"5/26", weekday:"二", topic:"年輕醫師培訓營", speaker:"腎臟內科 黃筠婷醫師／精神醫學部 鄭琬霖醫師／加護醫學部 賴志政醫師／腦中風中心 謝孟倉主任", host:"郭進榮主任", tags:["專業","六大核心","進階","CFD 核心"], details:["醫師繼續教育「專業」學分 1.2 分","臨床教師認證 B 類「六大核心」與「進階」各 1 學分","CFD 核心課程 10 點、科部外教學績效積分"] },
+      { date:"6/05", weekday:"五", topic:"臨床病理討論會 (CPC)", speaker:"胃腸肝膽科 楊峻嘉醫師／吳佩叡醫師", host:"朱彰堯醫師", tags:["專業","生理","CFD 一般"], details:["醫師、專科護理師繼續教育「專業」學分 1.2 分","臨床教師認證 A 類 a「生理」1 學分","CFD 一般課程 5 點、科部外教學績效積分"] },
+      { date:"6/10", weekday:"三", topic:"末期病人善終照護個案討論會", speaker:"整形外科 方意惟醫師／林聿山主任", host:"柯獻欽部長", tags:["倫理","安寧","倫理及法律","CFD 核心","緩和醫療"], details:["醫師、專科護理師繼續教育「倫理」學分 1.2 分","臨床教師認證 A 類 d「安寧」、D 類「倫理及法律」各 1 學分","CFD 核心課程 10 點、科部外教學績效積分","員工教育訓練「緩和醫療」1 學分"] },
+      { date:"6/12", weekday:"五", topic:"日本 Primary Care 研究的現況與展望", speaker:"青木拓也 副教授（東京慈惠会医科大学 臨床疫學研究部）", host:"黃建元總監", poster:"posters/1150612.jpg", tags:["品質","社會、長照","CFD 核心","全人醫療"], details:["醫師、專科護理師繼續教育「品質」學分 1.2 分","臨床教師認證 A 類 d「社會、長照」1 學分","CFD 核心課程 10 點、科部外教學績效積分","員工教育訓練「全人醫療」1 學分"] },
+      { date:"6/16", weekday:"二", topic:"醫療 AI 臨床與研究應用之倫理考量", speaker:"蔡甫昌教授（臺大醫學院醫學教育暨生醫倫理學科暨研究所）", host:"醫倫會 林慧娟主委", poster:"posters/1150616.jpg", tags:["倫理","倫理及法律","CFD 核心","醫學倫理"], details:["醫師、專科護理師繼續教育「倫理」學分 1.2 分","臨床教師認證 D 類「倫理及法律」1 學分","CFD 核心課程 10 點、科部外教學績效積分","員工教育訓練「醫學倫理」1 學分"] },
+      { date:"6/24", weekday:"三", topic:"跨越醫院圍牆：居家醫療照護生態系的未來", speaker:"Bruce A. Leff, MD（約翰·霍普金斯大學醫學院）", host:"黃建程主任", tags:["品質","社會、長照","CFD 核心","全人醫療"], details:["醫師、專科護理師繼續教育「品質」學分 1.2 分","臨床教師認證 A 類 d「社會、長照」1 學分","CFD 核心課程 10 點、科部外教學績效積分","員工教育訓練「全人醫療」1 學分"] },
+      { date:"7/03", weekday:"五", topic:"細胞治療的真實與謊言", speaker:"林建廷醫師（台大癌醫中心分院 血液腫瘤部）", host:"李健逢部長", tags:["專業","生理","CFD 一般"], details:["醫師、專科護理師繼續教育「專業」學分 1.2 分","臨床教師認證 A 類 a「生理」1 學分","CFD 一般課程 5 點、科部外教學績效積分"] },
+      { date:"7/07", weekday:"二", topic:"出國進修心得分享", speaker:"大腸直腸外科 黃亘毅醫師／放射診斷科 周怡甄醫師／肝膽科 王宿鴻主任", host:"陳鋭溢醫師", tags:["品質","進階","CFD 核心"], details:["醫師、專師繼續教育「品質」學分 1.2 分","臨床教師認證「進階」1 學分","CFD 核心課程 10 點、科部外教學績效積分"] },
+      { date:"7/15", weekday:"三", topic:"從零到無限大：奇美精神與我的旅程", speaker:"陳炳仁醫師（高雄醫學大學醫學系副教授）", host:"黃建元總監", tags:["倫理","醫學人文","CFD 核心","全人醫療"], details:["醫師、專師繼續教育「倫理」學分 1.2 分","CFD 核心學分 10 分、科部外教學績效學分","臨床教師認證 Ac 類『醫學人文』 1 學分","員工教育訓練「全人醫療」1 學分"] },
+      { date:"7/24", weekday:"五", topic:"健康職場 — 性別敏感度及性騷擾防治（性別平等教育）", speaker:"江承曉 助理教授（嘉南藥理大學社會工作系）", host:"陳綉琴副院長", tags:["性別","倫理","倫理及法律","CFD 核心","醫療相關法規"], details:["醫師、專師繼續教育「倫理-性別」學分 1.2 分","臨床教師認證 D 類「倫理及法律」1 學分","CFD 核心課程 10 點、科部外教學績效積分","員工教育訓練「醫療相關法規」1 學分"] },
+      { date:"8/07", weekday:"五", topic:"The novel advances of energy-based technology and regenerative medicine in Urogynecology", speaker:"龍震宇部長（高雄醫學大學附設中和紀念醫院 婦產部）", host:"吳銘斌主任", tags:["專業","生理","CFD 一般"], details:["醫師、專科護理師繼續教育「專業」學分 1.2 分","臨床教師認證 A 類 a「生理」1 學分","CFD 一般課程 5 點、科部外教學績效積分"] },
+      { date:"8/12", weekday:"三", topic:"悍衛兒童微笑的權利：高醫兒少保行動團隊的守護與實踐", speaker:"徐仲豪部長（高雄醫學大學附設醫院 兒科部）", host:"周琪部長", tags:["倫理","倫理及法律","CFD 核心","醫學倫理"], details:["醫師、專師繼續教育「倫理」學分 1.2 分","CFD 核心學分 10 分、科部外教學績效學分","臨床教師認證 D 類『倫理及法律』 1 學分","員工教育訓練「醫學倫理」1 學分"] },
+      { date:"8/18", weekday:"二", topic:"（主題待公告）", speaker:"張濱璿醫師（聯新國際醫療集團 法務長）", host:"醫倫會 林慧娟主委", tags:[], details:[] },
+      { date:"8/21", weekday:"五", topic:"職場不法侵害預防（兩性相關議題）", speaker:"溫菀婷律師", host:"陳綉琴副院長", tags:["性別","倫理","倫理及法律","CFD 核心","醫療相關法規"], details:["醫師、專師繼續教育「倫理-性別」學分 1.2 分","臨床教師認證 D 類「倫理及法律」1 學分","CFD 核心課程 10 點、科部外教學績效積分","員工教育訓練「醫療相關法規」1 學分"] },
+      { date:"9/04", weekday:"五", topic:"從小小心臟，看見整個醫療體系", speaker:"陳銘仁院長（高雄馬偕兒童醫院）", host:"周琪部長", tags:["專業","生理","六大核心","CFD 一般"], details:["醫師、專科護理師繼續教育「專業」學分 1.2 分","臨床教師認證 A 類 a「生理」、B 類「六大核心能力」各 1 學分","CFD 一般課程 5 點、科部外教學績效積分"] },
+      { date:"9/09", weekday:"三", topic:"臨床倫理討論會", speaker:"婦產部", host:"", tags:["倫理","倫理及法律","CFD 核心","醫學倫理"], details:["醫師、專師繼續教育「倫理」學分 1.2 分","CFD 核心學分 10 分、科部外教學績效學分","臨床教師認證 D 類『倫理及法律』 1 學分","員工教育訓練「醫學倫理」1 學分"] },
+      { date:"9/15", weekday:"二", topic:"癌症粒子治療的新進展：質子、重粒子、硼中子", speaker:"邱仲峯教授（臺北醫學大學臺北癌症中心 質子中心召集人）", host:"楊清傑醫師", tags:["專業","生理","CFD 一般"], details:["醫師及專師「專業」繼續教育學分 1.2 分","臨床教師認證 A 類 a「生理」1 學分","CFD 一般課程 5 點、科部外教學績效積分"] },
+      { date:"10/02", weekday:"五", topic:"斷食？善終！", speaker:"謝宛婷醫師（蔚然法律事務所）", host:"陳綉琴副院長", tags:["倫理","生理","安寧","CFD 核心","緩和醫療"], details:["醫師、專科護理師繼續教育「倫理」學分 1.2 分","臨床教師認證 A 類 a「生理」、A 類 d「安寧」各 1 學分","CFD 核心課程 10 點、科部外教學績效積分","員工教育訓練「緩和醫療」1 學分"] },
+      { date:"10/06", weekday:"二", status:"tba" },
+      { date:"10/14", weekday:"三", status:"tba" },
+      { date:"11/06", weekday:"五", status:"tba" },
+      { date:"11/11", weekday:"三", status:"tba" },
+      { date:"11/17", weekday:"二", status:"tba" },
+      { date:"12/04", weekday:"五", topic:"臨床病理討論會 (CPC)", speaker:"（講師待公告）", host:"", tags:["專業","生理","CFD 一般"], details:["醫師、專科護理師繼續教育「專業」學分 1.2 分","臨床教師認證 A 類 a「生理」1 學分","CFD 一般課程 5 點、科部外教學績效積分"] },
+      { date:"12/09", weekday:"三", topic:"（主題待公告）", speaker:"周文堅主任（台大醫院 血液科）", host:"吳鴻昌主任", tags:[], details:[] },
+      { date:"12/15", weekday:"二", topic:"末期病人善終照護個案討論會", speaker:"兒科部", host:"", tags:["倫理","生理","安寧","CFD 核心","緩和醫療"], details:["醫師、專科護理師繼續教育「倫理」學分 1.2 分","臨床教師認證 A 類 a「生理」、A 類 d「安寧」各 1 學分","CFD 核心課程 10 點、科部外教學績效積分","員工教育訓練「緩和醫療」1 學分"] }
+    ]
+  },
+  /* ───── 新年度上線方式 ─────
+   * 當 116 / 117 年度課程確認後，在這裡加入：
+   *   116: { adYear: 2027, updated: "116.MM.DD", location: "第五醫療大樓五樓國際會議廳",
+   *          timeStart: "07:30", timeEnd: "08:30",
+   *          courses: [ { date:"1/16", weekday:"五", topic:"...", speaker:"...", host:"...",
+   *                       tags:["..."], details:["..."] }, ... ] },
+   * 年度 tab、查詢、即將開課、行事曆下載皆會自動運作。
+   * ─────────────────────── */
+};
+
+/* 學分標籤顯示對照（卡片上的彩色按鈕）
+ * - 臨床教師認證類別 → 顯示為 "CFD ..." 前綴
+ * - CFD 核心 / 一般點數不顯示為按鈕（仍可被查詢條件搜尋）
+ */
+const TAG_LABEL = {
+  "六大核心":   "CFD B類六大核心",
+  "進階":       "CFD 進階",
+  "生理":       "CFD Aa類生理",
+  "健康促進":   "CFD Ab類健康促進",
+  "醫學人文":   "CFD Ac類醫學人文",
+  "安寧":       "CFD Ad類安寧",
+  "社會、長照": "CFD Ad類社會長照",
+  "倫理及法律": "CFD D類倫理及法律"
+};
+const TAG_HIDDEN = new Set(["CFD 核心", "CFD 一般"]);
+
+/* =========================================================
+ * 狀態
+ * ========================================================= */
+const TODAY = new Date();
+const TODAY_AD_YEAR = TODAY.getFullYear();
+const TODAY_MONTH = TODAY.getMonth() + 1;
+
+let currentYear = null;
+
+/* =========================================================
+ * 工具
+ * ========================================================= */
+const $ = (id) => document.getElementById(id);
+const escapeHtml = (s) => String(s || "").replace(/[&<>"']/g, c => ({
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+}[c]));
+const pad = (n) => String(n).padStart(2, "0");
+
+function twToAdYear(tw) { return SCHEDULE[tw]?.adYear ?? (1911 + Number(tw)); }
+function isCurrentMonth(twYear, mdString) {
+  const ad = twToAdYear(twYear);
+  const m = parseInt(mdString.split("/")[0], 10);
+  return ad === TODAY_AD_YEAR && m === TODAY_MONTH;
+}
+function isFutureOrToday(twYear, mdString) {
+  const ad = twToAdYear(twYear);
+  const [m, d] = mdString.split("/").map(n => parseInt(n, 10));
+  const dt = new Date(ad, m - 1, d);
+  return dt >= new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate());
+}
+
+/* =========================================================
+ * 元素
+ * ========================================================= */
+const listEl = $("course-list");
+const emptyEl = $("empty");
+const countEl = $("count");
+const placeholderEl = $("year-placeholder");
+const filterCard = $("filter-card");
+const filters = {
+  month: $("f-month"),
+  speaker: $("f-speaker"),
+  topic: $("f-topic"),
+  credit: $("f-credit"),
+  hide: $("hide-inactive"),
+};
+
+/* =========================================================
+ * 年度切換 tabs
+ * ========================================================= */
+function renderYearTabs() {
+  const wrap = $("year-tabs");
+  const years = Object.keys(SCHEDULE).sort((a,b) => Number(b)-Number(a));
+  wrap.innerHTML = years.map(y => {
+    const yr = SCHEDULE[y];
+    const isThisYear = yr.adYear === TODAY_AD_YEAR;
+    const hasData = yr.courses && yr.courses.length > 0;
+    const cls = ["year-tab"];
+    if (Number(y) === currentYear) cls.push("active");
+    if (!hasData) cls.push("tba");
+    return `<button class="${cls.join(" ")}" data-year="${y}">
+      ${y} 年度（${yr.adYear}）
+      ${isThisYear ? '<span class="pill">本年度</span>' : ''}
+      ${!hasData ? '<span class="pill">待公告</span>' : ''}
+    </button>`;
+  }).join("");
+
+  wrap.querySelectorAll(".year-tab").forEach(btn => {
+    btn.addEventListener("click", () => selectYear(Number(btn.dataset.year)));
+  });
+}
+
+function selectYear(y) {
+  currentYear = y;
+  $("page-title").textContent = `${y} 年 全院教學活動時間表`;
+  $("meta-updated").textContent = `更新日期：${SCHEDULE[y].updated}`;
+  document.querySelectorAll(".year-tab").forEach(b => {
+    b.classList.toggle("active", Number(b.dataset.year) === y);
+  });
+  // 重置篩選
+  filters.month.value = "";
+  filters.speaker.value = "";
+  filters.topic.value = "";
+  filters.credit.value = "";
+  filters.hide.checked = false;
+  render();
+}
+
+/* =========================================================
+ * 即將到來 (Spotlight) — 顯示「從今天起」的下一批課程
+ * 不論在年中哪個時間點瀏覽，都能看到最即時的下一場
+ * ========================================================= */
+const SPOTLIGHT_LIMIT = 3;       // 最多顯示幾場
+const SPOTLIGHT_DAYS  = 60;      // 只顯示未來 N 天內
+
+function daysUntil(twYear, mdString) {
+  const ad = twToAdYear(twYear);
+  const [m, d] = mdString.split("/").map(n => parseInt(n, 10));
+  const target = new Date(ad, m - 1, d);
+  const today  = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate());
+  return Math.round((target - today) / 86400000);
+}
+function relativeLabel(days) {
+  if (days === 0) return "今天";
+  if (days === 1) return "明天";
+  if (days === 2) return "後天";
+  if (days <= 7)  return `${days} 天後`;
+  if (days <= 30) return `約 ${Math.round(days/7)} 週後`;
+  return `${days} 天後`;
+}
+
+function renderSpotlight() {
+  const yr = SCHEDULE[currentYear];
+  const spotlight = $("spotlight");
+
+  // 過去的年度（adYear < 今年）不顯示
+  if (yr.adYear < TODAY_AD_YEAR) { spotlight.style.display = "none"; return; }
+
+  // 從今天起的有效課程（排除取消/休假/待公告）
+  const upcoming = yr.courses
+    .filter(c => !c.status && isFutureOrToday(currentYear, c.date))
+    .filter(c => daysUntil(currentYear, c.date) <= SPOTLIGHT_DAYS)
+    .slice(0, SPOTLIGHT_LIMIT);
+
+  $("spotlight-title").innerHTML = `📢 即將到來`;
+
+  const cardsEl = $("spotlight-cards");
+  if (upcoming.length === 0) {
+    $("spotlight-meta").innerHTML = `近 ${SPOTLIGHT_DAYS} 天內無排定課程`;
+    cardsEl.innerHTML = '<div class="spotlight-empty">本年度即將到來的演講已全部結束，或下一場仍在規劃中。</div>';
+    spotlight.style.display = "block";
+    return;
+  }
+
+  $("spotlight-meta").innerHTML = `接下來 <strong>${upcoming.length}</strong> 場演講（${SPOTLIGHT_DAYS} 天內）`;
+
+  cardsEl.innerHTML = upcoming.map((c, idx) => {
+    const d = daysUntil(currentYear, c.date);
+    const rel = relativeLabel(d);
+    const urgentCls = d <= 7 ? "urgent" : "";
+    const topic = c.topic || "（主題待公告）";
+
+    // 海報區 — 若有 poster 欄位顯示圖片 (可放大)，否則自動生成文字版海報
+    const posterArea = c.poster
+      ? `<img class="spot-poster-img" src="${escapeHtml(c.poster)}"
+              alt="${escapeHtml(topic)} 宣傳海報"
+              data-poster-idx="${idx}">`
+      : buildPosterPlaceholder(c);
+
+    return `<div class="spot-card">
+      <div class="spot-poster-wrap">${posterArea}</div>
+      <div class="spot-card-foot">
+        <div class="spot-card-when">
+          ${c.date}（${c.weekday}）<br><span class="${urgentCls}">${rel} · 07:30</span>
+        </div>
+        <button class="btn-ics-sm" data-spot-idx="${idx}">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          加入行事曆
+        </button>
+      </div>
+    </div>`;
+  }).join("");
+
+  // 加入行事曆按鈕
+  cardsEl.querySelectorAll("[data-spot-idx]").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const idx = Number(btn.dataset.spotIdx);
+      downloadICS([upcoming[idx]]);
+      showToast("已加入行事曆 ✓");
+    });
+  });
+
+  // 點海報放大；載入失敗 → 替換為文字版海報
+  cardsEl.querySelectorAll(".spot-poster-img").forEach(img => {
+    img.addEventListener("click", () => openLightbox(img.src, img.alt));
+    img.addEventListener("error", () => {
+      const idx = Number(img.dataset.posterIdx);
+      const wrap = img.parentElement;
+      wrap.innerHTML = buildPosterPlaceholder(upcoming[idx], "(海報載入失敗)");
+    });
+  });
+
+  spotlight.style.display = "block";
+}
+
+/* =========================================================
+ * 海報文字版（無實體海報時自動產生）+ 放大檢視 (Lightbox)
+ * ========================================================= */
+function buildPosterPlaceholder(c, extraNote) {
+  return `<div class="spot-poster-placeholder">
+    <div class="spot-ph-date">📅 ${c.date}（${c.weekday}）　07:30 – 08:30</div>
+    <div class="spot-ph-topic">${escapeHtml(c.topic || '（主題待公告）')}</div>
+    <div class="spot-ph-speaker">${escapeHtml(c.speaker || '')}</div>
+    <div class="spot-ph-tag">${escapeHtml(extraNote || '海報製作中')}</div>
+  </div>`;
+}
+
+function openLightbox(src, alt) {
+  const img = $("lightbox-img");
+  img.src = src;
+  img.alt = alt || "";
+  $("lightbox").classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+function closeLightbox() {
+  $("lightbox").classList.remove("show");
+  document.body.style.overflow = "";
+}
+
+/* =========================================================
+ * 主課程列表
+ * ========================================================= */
+function statusBadge(c) {
+  if (c.status === "cancelled") return '<span class="status-badge badge-cancelled">取消</span>';
+  if (c.status === "holiday") return '<span class="status-badge badge-holiday">休假/暫停</span>';
+  if (c.status === "tba") return '<span class="status-badge badge-tba">待公告</span>';
+  if (c.special) return `<span class="status-badge badge-special">${escapeHtml(c.special)}</span>`;
+  return "";
+}
+
+function buildCard(c, idx) {
+  const [m, d] = c.date.split("/");
+  const cls = ["course-card"];
+  if (c.status) cls.push(`status-${c.status}`);
+
+  // 「即將開課」: 從今天起 14 天內 → 列表中以淺金色高亮，更貼近實際時間感
+  const isSoon = !c.status && (() => {
+    const dd = daysUntil(currentYear, c.date);
+    return dd >= 0 && dd <= 14;
+  })();
+  if (isSoon) cls.push("is-upcoming");
+
+  const topic = c.topic || (c.status === "cancelled" ? "本次暫停" :
+                            c.status === "holiday" ? (c.note || "假期暫停") :
+                            c.status === "tba" ? "主題待公告" : "");
+
+  const soonBadge = isSoon ? '<span class="status-badge badge-current">即將到來</span>' : '';
+
+  let html = `<div class="${cls.join(" ")}">
+    <div class="date-block" data-month="${parseInt(m, 10)}">
+      <div class="date-month">${m} 月</div>
+      <div class="date-day">${d}</div>
+      <div class="date-weekday">星期${c.weekday}</div>
+    </div>
+    <div class="course-body">
+      <div class="course-topic">${escapeHtml(topic)} ${soonBadge}</div>`;
+
+  if (c.speaker || c.host || c.note) {
+    html += `<div class="course-info">`;
+    if (c.speaker) html += `<div class="info-item"><span class="info-label">主講｜</span><span class="info-value">${escapeHtml(c.speaker)}</span></div>`;
+    if (c.host) html += `<div class="info-item"><span class="info-label">主持｜</span><span class="info-value">${escapeHtml(c.host)}</span></div>`;
+    if (c.note && c.status !== "holiday") html += `<div class="info-item"><span class="info-label">備註｜</span><span class="info-value">${escapeHtml(c.note)}</span></div>`;
+    html += `</div>`;
+  }
+
+  const visibleTags = (c.tags || []).filter(t => !TAG_HIDDEN.has(t));
+  if (visibleTags.length) {
+    html += `<div class="credit-tags">` + visibleTags.map(t => {
+      const label = TAG_LABEL[t] || t;
+      return `<span class="credit-tag">${escapeHtml(label)}</span>`;
+    }).join("") + `</div>`;
+  }
+
+  if (c.details && c.details.length) {
+    html += `<div class="credit-detail">` + c.details.map(d => `<span class="credit-detail-line">• ${escapeHtml(d)}</span>`).join("") + `</div>`;
+  }
+
+  html += `</div>
+    <div class="course-actions">
+      ${(!c.status) ? `<button class="btn-ics" data-card-idx="${idx}">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        加入行事曆
+      </button>` : ''}
+    </div>
+  </div>`;
+  return html;
+}
+
+function matches(c) {
+  if (filters.hide.checked && c.status) return false;
+  const month = filters.month.value;
+  if (month && parseInt(c.date.split("/")[0], 10) !== parseInt(month, 10)) return false;
+  const sp = filters.speaker.value.trim().toLowerCase();
+  if (sp && !(c.speaker || "").toLowerCase().includes(sp) && !(c.host || "").toLowerCase().includes(sp)) return false;
+  const tp = filters.topic.value.trim().toLowerCase();
+  if (tp && !(c.topic || "").toLowerCase().includes(tp)) return false;
+  const cr = filters.credit.value;
+  if (cr) {
+    const inTags = (c.tags || []).some(t => t.includes(cr));
+    const inDetails = (c.details || []).some(d => d.includes(cr));
+    if (!inTags && !inDetails) return false;
+  }
+  return true;
+}
+
+let filteredCache = [];
+function render() {
+  const yr = SCHEDULE[currentYear];
+  const hasData = yr.courses && yr.courses.length > 0;
+
+  renderSpotlight();
+
+  if (!hasData) {
+    placeholderEl.style.display = "block";
+    listEl.style.display = "none";
+    emptyEl.style.display = "none";
+    filterCard.style.display = "none";
+    $("placeholder-title").textContent = `${currentYear} 年度尚未公告`;
+    $("placeholder-text").textContent = `${yr.adYear} 年度課程資訊將於後續公布，敬請期待。`;
+    return;
+  }
+
+  placeholderEl.style.display = "none";
+  filterCard.style.display = "block";
+  listEl.style.display = "flex";
+
+  filteredCache = yr.courses.filter(matches);
+  listEl.innerHTML = filteredCache.map((c, i) => buildCard(c, i)).join("");
+  countEl.textContent = filteredCache.length;
+  emptyEl.style.display = filteredCache.length === 0 ? "block" : "none";
+
+  listEl.querySelectorAll("[data-card-idx]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = Number(btn.dataset.cardIdx);
+      downloadICS([filteredCache[idx]]);
+      showToast("已加入行事曆 ✓");
+    });
+  });
+}
+
+/* =========================================================
+ * ICS 行事曆檔產生
+ * ========================================================= */
+function pad2(n) { return String(n).padStart(2, "0"); }
+function adDateString(twYear, mdStr, timeStr) {
+  const ad = twToAdYear(twYear);
+  const [m, d] = mdStr.split("/").map(n => parseInt(n, 10));
+  const [hh, mm] = timeStr.split(":").map(n => parseInt(n, 10));
+  return `${ad}${pad2(m)}${pad2(d)}T${pad2(hh)}${pad2(mm)}00`;
+}
+function nowUtcStamp() {
+  const now = new Date();
+  return `${now.getUTCFullYear()}${pad2(now.getUTCMonth()+1)}${pad2(now.getUTCDate())}T${pad2(now.getUTCHours())}${pad2(now.getUTCMinutes())}${pad2(now.getUTCSeconds())}Z`;
+}
+function foldLine(line) {
+  // ICS RFC 5545：每行最多 75 octets，超過要 fold
+  if (line.length <= 73) return line;
+  const out = [];
+  let i = 0;
+  while (i < line.length) {
+    out.push((i === 0 ? "" : " ") + line.slice(i, i + 73));
+    i += 73;
+  }
+  return out.join("\r\n");
+}
+
+function buildVEvent(course, twYear) {
+  const yr = SCHEDULE[twYear];
+  const dtStart = adDateString(twYear, course.date, yr.timeStart);
+  const dtEnd = adDateString(twYear, course.date, yr.timeEnd);
+  const uid = `cm-lecture-${twYear}-${course.date.replace("/","")}@chimei.org.tw`;
+  const summary = `全院演講｜${course.topic || "主題待公告"}`;
+  const location = course.location || yr.location;
+
+  const descLines = [];
+  if (course.speaker) descLines.push(`主講：${course.speaker}`);
+  if (course.host) descLines.push(`主持：${course.host}`);
+  if (course.details && course.details.length) {
+    descLines.push("");
+    descLines.push("學分：");
+    course.details.forEach(d => descLines.push(`• ${d}`));
+  }
+  if (course.note) descLines.push(`備註：${course.note}`);
+  const description = descLines.join("\\n");
+
+  const lines = [
+    "BEGIN:VEVENT",
+    `UID:${uid}`,
+    `DTSTAMP:${nowUtcStamp()}`,
+    `DTSTART:${dtStart}`,
+    `DTEND:${dtEnd}`,
+    `SUMMARY:${escapeIcsText(summary)}`,
+    `LOCATION:${escapeIcsText(location)}`,
+    `DESCRIPTION:${escapeIcsText(description)}`,
+    "BEGIN:VALARM",
+    "ACTION:DISPLAY",
+    "DESCRIPTION:全院演講即將開始",
+    "TRIGGER:-PT30M",
+    "END:VALARM",
+    "END:VEVENT"
+  ];
+  return lines.map(foldLine).join("\r\n");
+}
+
+function escapeIcsText(s) {
+  return String(s || "")
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\r?\n/g, "\\n");
+}
+
+function buildICSDocument(courses, twYear) {
+  const events = courses
+    .filter(c => !c.status) // 排除取消/休假/待定
+    .map(c => buildVEvent(c, twYear));
+  return [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//ChiMei Hospital//Lecture Schedule//ZH-TW",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    `X-WR-CALNAME:${twYear}年 全院教學活動`,
+    "X-WR-TIMEZONE:Asia/Taipei",
+    ...events,
+    "END:VCALENDAR"
+  ].join("\r\n");
+}
+
+function downloadICS(courses, filenamePrefix) {
+  const valid = courses.filter(c => !c.status);
+  if (valid.length === 0) {
+    showToast("沒有可加入的課程");
+    return;
+  }
+  const ics = buildICSDocument(valid, currentYear);
+  const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const prefix = filenamePrefix || (valid.length === 1
+    ? `lecture-${currentYear}-${valid[0].date.replace("/","")}`
+    : `lectures-${currentYear}-batch`);
+  a.href = url;
+  a.download = `${prefix}.ics`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/* =========================================================
+ * Toast
+ * ========================================================= */
+let toastTimer = null;
+function showToast(msg) {
+  $("toast-msg").textContent = msg;
+  const t = $("toast");
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+/* =========================================================
+ * 事件
+ * ========================================================= */
+Object.values(filters).forEach(el => {
+  el.addEventListener("input", render);
+  el.addEventListener("change", render);
+});
+
+$("btn-clear").addEventListener("click", () => {
+  filters.month.value = "";
+  filters.speaker.value = "";
+  filters.topic.value = "";
+  filters.credit.value = "";
+  filters.hide.checked = false;
+  render();
+});
+
+$("btn-batch").addEventListener("click", () => {
+  if (filteredCache.length === 0) { showToast("沒有可加入的課程"); return; }
+  const valid = filteredCache.filter(c => !c.status);
+  if (valid.length === 0) { showToast("篩選結果中沒有可加入的課程"); return; }
+  downloadICS(valid);
+  showToast(`已產生 ${valid.length} 場課程的行事曆檔`);
+});
+
+// Lightbox 關閉
+$("lightbox").addEventListener("click", (e) => {
+  if (e.target.id !== "lightbox-img") closeLightbox();
+});
+$("lightbox-close").addEventListener("click", (e) => { e.stopPropagation(); closeLightbox(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeLightbox(); });
+
+/* =========================================================
+ * 啟動
+ * ========================================================= */
+(function init() {
+  // 預設選擇本西元年對應的年度（若有）；否則選最新有資料的年度
+  const years = Object.keys(SCHEDULE).map(Number).sort((a,b)=>b-a);
+  const matchYear = years.find(y => SCHEDULE[y].adYear === TODAY_AD_YEAR);
+  const yearWithData = years.find(y => SCHEDULE[y].courses && SCHEDULE[y].courses.length > 0);
+  currentYear = matchYear || yearWithData || years[0];
+  renderYearTabs();
+  selectYear(currentYear);
+})();
+</script>
+</body>
+</html>
