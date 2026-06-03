@@ -599,6 +599,192 @@
     background: rgba(255,255,255,0.5);
   }
 
+  /* ====== 管理者後台 ====== */
+  .admin-link {
+    color: var(--gray-500); font-size: 12px;
+    opacity: 0.6; cursor: pointer; margin-left: 12px;
+    background: none; border: none; font-family: inherit;
+    text-decoration: underline; text-underline-offset: 3px;
+  }
+  .admin-link:hover { opacity: 1; color: var(--primary); }
+
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    z-index: 1100; display: none;
+    align-items: center; justify-content: center;
+    padding: 20px; overflow-y: auto;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: #fff; border-radius: 16px;
+    max-width: 640px; width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+    animation: modal-in 0.2s ease-out;
+  }
+  @keyframes modal-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .modal-head {
+    padding: 18px 24px; border-bottom: 1px solid var(--gray-100);
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; background: #fff; border-radius: 16px 16px 0 0; z-index: 1;
+  }
+  .modal-title { font-size: 17px; font-weight: 700; color: var(--primary-dark); }
+  .modal-x {
+    background: none; border: none; cursor: pointer;
+    width: 32px; height: 32px; border-radius: 50%;
+    color: var(--gray-500); display: flex; align-items: center; justify-content: center;
+  }
+  .modal-x:hover { background: var(--gray-100); color: var(--gray-900); }
+  .modal-x svg { width: 18px; height: 18px; }
+  .modal-body { padding: 22px 24px; }
+  .modal-foot {
+    padding: 14px 24px; border-top: 1px solid var(--gray-100);
+    display: flex; justify-content: flex-end; gap: 10px;
+    position: sticky; bottom: 0; background: #fff; border-radius: 0 0 16px 16px;
+  }
+
+  .form-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .form-row.cols { flex-direction: row; gap: 12px; }
+  .form-row.cols > .form-col { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .form-label { font-size: 12.5px; font-weight: 600; color: var(--gray-700); letter-spacing: 0.2px; }
+  .form-label .req { color: #dc2626; margin-left: 2px; }
+  .form-input, .form-textarea, .form-select {
+    padding: 10px 12px; border: 1.5px solid var(--gray-200);
+    border-radius: 8px; font-size: 14px; font-family: inherit;
+    background: #fff; width: 100%; color: var(--gray-900);
+  }
+  .form-input:focus, .form-textarea:focus, .form-select:focus {
+    outline: none; border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+  }
+  .form-textarea { resize: vertical; min-height: 90px; font-family: inherit; }
+  .form-hint { font-size: 11.5px; color: var(--gray-500); margin-top: 2px; line-height: 1.5; }
+  .form-error { font-size: 12.5px; color: #dc2626; margin-top: 6px; min-height: 18px; }
+
+  .btn-form {
+    padding: 9px 18px; border-radius: 8px;
+    font-size: 14px; font-weight: 600;
+    border: none; cursor: pointer; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: all 0.15s;
+  }
+  .btn-form svg { width: 14px; height: 14px; }
+  .btn-form-primary { background: var(--primary); color: #fff; }
+  .btn-form-primary:hover { background: var(--primary-dark); }
+  .btn-form-secondary { background: var(--gray-100); color: var(--gray-700); }
+  .btn-form-secondary:hover { background: var(--gray-200); }
+  .btn-form-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+  .btn-form-danger:hover { background: #dc2626; color: #fff; border-color: #dc2626; }
+
+  /* 學分標籤 checkbox */
+  .tag-grid {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    border: 1.5px solid var(--gray-200); border-radius: 8px;
+    padding: 10px; background: var(--gray-50);
+    max-height: 240px; overflow-y: auto;
+  }
+  .tag-cb {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 5px 11px; background: #fff;
+    border: 1px solid var(--gray-200); border-radius: 16px;
+    font-size: 12px; cursor: pointer; user-select: none;
+    transition: all 0.15s;
+  }
+  .tag-cb:hover { border-color: var(--accent); }
+  .tag-cb input { cursor: pointer; accent-color: var(--accent); }
+  .tag-cb.on { background: var(--accent-light); border-color: var(--accent); color: var(--warn); font-weight: 600; }
+  .tag-group-label {
+    width: 100%; font-size: 11px; font-weight: 700;
+    color: var(--gray-500); letter-spacing: 0.5px;
+    margin-top: 6px; padding-top: 4px; border-top: 1px dashed var(--gray-200);
+  }
+  .tag-group-label:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+  /* 海報上傳 */
+  .poster-uploader {
+    display: flex; gap: 14px; padding: 14px;
+    background: var(--gray-50);
+    border: 1.5px dashed var(--gray-200); border-radius: 8px;
+  }
+  .poster-preview-box {
+    width: 88px; height: 124px;
+    background: #fff;
+    border: 1px solid var(--gray-200); border-radius: 6px;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gray-300); flex-shrink: 0;
+  }
+  .poster-preview-box img { width: 100%; height: 100%; object-fit: cover; }
+  .poster-preview-box svg { width: 32px; height: 32px; }
+  .poster-info { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .poster-path {
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    font-size: 12px; color: var(--primary-dark);
+    background: var(--primary-light); padding: 4px 8px; border-radius: 4px;
+    word-break: break-all;
+  }
+  .poster-path:empty::before { content: "尚未選擇"; color: var(--gray-500); font-family: inherit; }
+
+  /* 管理者工具列 */
+  .admin-toolbar {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--primary-dark); color: #fff;
+    padding: 10px 14px; border-radius: 50px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.28);
+    display: flex; align-items: center; gap: 8px;
+    z-index: 90; opacity: 0; visibility: hidden;
+    transition: all 0.25s ease;
+  }
+  .admin-toolbar.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1; visibility: visible;
+  }
+  .admin-toolbar .btn-tb {
+    background: rgba(255,255,255,0.12); color: #fff;
+    border: none; padding: 8px 14px; border-radius: 50px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; gap: 5px;
+    transition: background 0.15s;
+  }
+  .admin-toolbar .btn-tb:hover { background: rgba(255,255,255,0.22); }
+  .admin-toolbar .btn-tb svg { width: 14px; height: 14px; }
+  .admin-toolbar .badge {
+    font-size: 11px; background: var(--accent);
+    padding: 3px 9px; border-radius: 10px;
+    font-weight: 700; letter-spacing: 0.4px;
+  }
+  .admin-toolbar .divider {
+    width: 1px; height: 18px;
+    background: rgba(255,255,255,0.2);
+  }
+
+  /* 卡片內的編輯/刪除按鈕 */
+  .card-admin-actions {
+    display: none; gap: 6px;
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px dashed var(--gray-200);
+  }
+  body.admin-mode .card-admin-actions { display: flex; }
+  .btn-card-mini {
+    font-size: 12px; padding: 5px 11px; border-radius: 6px;
+    border: 1px solid; cursor: pointer; font-family: inherit;
+    font-weight: 600; display: inline-flex; align-items: center; gap: 4px;
+    transition: all 0.15s;
+  }
+  .btn-card-edit { background: var(--primary-light); color: var(--primary-dark); border-color: #b6dde5; }
+  .btn-card-edit:hover { background: var(--primary); color: #fff; }
+  .btn-card-del { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+  .btn-card-del:hover { background: #dc2626; color: #fff; }
+
+  body.admin-mode { padding-bottom: 80px; }
+
   @media (max-width: 640px) {
     header { padding: 28px 0 64px; }
     .spotlight { padding: 20px; margin-top: -36px; }
@@ -766,9 +952,153 @@
   <div class="lightbox-hint">點任意處或按 Esc 關閉</div>
 </div>
 
+<!-- 管理者登入 Modal -->
+<div class="modal-overlay" id="login-modal" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-head">
+      <div class="modal-title">🔐 管理者登入</div>
+      <button class="modal-x" data-close="login-modal" aria-label="關閉"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <form class="modal-body" id="login-form" onsubmit="return false">
+      <div class="form-row">
+        <label class="form-label" for="login-user">帳號</label>
+        <input id="login-user" class="form-input" type="text" autocomplete="username" />
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="login-pass">密碼</label>
+        <input id="login-pass" class="form-input" type="password" autocomplete="current-password" />
+      </div>
+      <div class="form-error" id="login-error"></div>
+      <div class="form-hint">提醒：此為前端認證，僅用於避免一般訪客誤改資料。若有更嚴格的權限需求，建議搭配後端服務。</div>
+    </form>
+    <div class="modal-foot">
+      <button class="btn-form btn-form-secondary" data-close="login-modal">取消</button>
+      <button class="btn-form btn-form-primary" id="btn-login-submit">登入</button>
+    </div>
+  </div>
+</div>
+
+<!-- 課程編輯 Modal -->
+<div class="modal-overlay" id="editor-modal" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="editor-title">編輯課程</div>
+      <button class="modal-x" data-close="editor-modal" aria-label="關閉"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row cols">
+        <div class="form-col">
+          <label class="form-label" for="ed-year">年度<span class="req">*</span></label>
+          <select id="ed-year" class="form-select"></select>
+        </div>
+        <div class="form-col">
+          <label class="form-label" for="ed-date">日期 (M/D)<span class="req">*</span></label>
+          <input id="ed-date" class="form-input" type="text" placeholder="例如 6/24" />
+        </div>
+        <div class="form-col">
+          <label class="form-label" for="ed-weekday">星期</label>
+          <input id="ed-weekday" class="form-input" type="text" maxlength="1" placeholder="自動帶入" />
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="ed-topic">主題</label>
+        <input id="ed-topic" class="form-input" type="text" placeholder="演講主題標題" />
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="ed-speaker">主講者</label>
+        <input id="ed-speaker" class="form-input" type="text" placeholder="姓名（單位／職稱）" />
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="ed-host">主持人</label>
+        <input id="ed-host" class="form-input" type="text" placeholder="姓名／職稱" />
+      </div>
+      <div class="form-row cols">
+        <div class="form-col">
+          <label class="form-label" for="ed-tstart">開始時間</label>
+          <input id="ed-tstart" class="form-input" type="text" placeholder="預設 07:30" />
+        </div>
+        <div class="form-col">
+          <label class="form-label" for="ed-tend">結束時間</label>
+          <input id="ed-tend" class="form-input" type="text" placeholder="預設 08:30" />
+        </div>
+        <div class="form-col">
+          <label class="form-label" for="ed-status">狀態</label>
+          <select id="ed-status" class="form-select">
+            <option value="">正常開課</option>
+            <option value="cancelled">取消</option>
+            <option value="holiday">休假／暫停</option>
+            <option value="tba">待公告</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">學分類別（可複選）</label>
+        <div class="tag-grid" id="ed-tags"></div>
+        <div class="form-hint">勾選課程涵蓋的學分類別；CFD 前綴會自動依「學分明細」內容判斷是否標示。</div>
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="ed-details">學分明細</label>
+        <textarea id="ed-details" class="form-textarea" placeholder="每一行一筆學分說明，例如：&#10;醫師、專師繼續教育「品質」學分 1.2 分&#10;臨床教師認證 B 類「六大核心」1 學分&#10;CFD 核心課程 10 點"></textarea>
+        <div class="form-hint">含有「臨床教師認證」字樣的行，其關聯標籤會顯示為 CFD 前綴。</div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">宣傳海報</label>
+        <div class="poster-uploader">
+          <div class="poster-preview-box" id="ed-poster-preview-box">
+            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </div>
+          <div class="poster-info">
+            <input type="file" id="ed-file" accept="image/jpeg,image/png,image/webp" style="font-size:12.5px" />
+            <div class="poster-path" id="ed-poster-path"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button type="button" class="btn-form btn-form-secondary" id="btn-poster-download" style="font-size:12px;padding:6px 12px">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
+                下載重命名後的海報
+              </button>
+              <button type="button" class="btn-form btn-form-secondary" id="btn-poster-clear" style="font-size:12px;padding:6px 12px">清除海報</button>
+            </div>
+            <div class="form-hint">建議 A4 直式比例。上傳後請點「下載重命名後的海報」，並將檔案放入 <code>posters/</code> 資料夾。</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="ed-note">備註</label>
+        <input id="ed-note" class="form-input" type="text" placeholder="例如：本場次特殊時間、地點變更…" />
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-form btn-form-danger" id="btn-editor-delete" style="margin-right:auto;display:none">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a2 2 0 012-2h2a2 2 0 012 2v3"/></svg>
+        刪除這場
+      </button>
+      <button class="btn-form btn-form-secondary" data-close="editor-modal">取消</button>
+      <button class="btn-form btn-form-primary" id="btn-editor-save">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 管理者工具列 -->
+<div class="admin-toolbar" id="admin-toolbar" role="toolbar">
+  <span class="badge">管理者模式</span>
+  <div class="divider"></div>
+  <button class="btn-tb" id="btn-add-course">
+    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+    新增課程
+  </button>
+  <button class="btn-tb" id="btn-export">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
+    匯出更新版 HTML
+  </button>
+  <div class="divider"></div>
+  <button class="btn-tb" id="btn-logout">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+    登出
+  </button>
+</div>
+
 <footer>
   <div class="container">
-    <p>奇美醫療財團法人奇美醫院 教學部 · 全院演講公告</p>
+    <p>奇美醫療財團法人奇美醫院 教學部 · 全院演講公告<button class="admin-link" id="btn-admin-login">管理者登入</button></p>
   </div>
 </footer>
 
@@ -953,6 +1283,9 @@ const TODAY_AD_YEAR = TODAY.getFullYear();
 const TODAY_MONTH = TODAY.getMonth() + 1;
 
 let currentYear = null;
+let isAdmin = false;
+let editCtx = null;            // 編輯中的課程：{ year, idx, isNew }
+let pendingPosterUpload = null; // 待下載的海報檔 { filename, dataUri, file }
 
 /* =========================================================
  * 工具
@@ -1090,9 +1423,10 @@ function renderSpotlight() {
     const urgentCls = d <= 7 ? "urgent" : "";
     const topic = c.topic || "（主題待公告）";
 
-    // 海報區 — 若有 poster 欄位顯示圖片 (可放大)，否則自動生成文字版海報
-    const posterArea = c.poster
-      ? `<img class="spot-poster-img" src="${escapeHtml(c.poster)}"
+    // 海報區 — 優先用 _previewPoster (管理者剛上傳尚未存檔)，否則用 c.poster；都沒有則文字版
+    const posterSrc = c._previewPoster || c.poster;
+    const posterArea = posterSrc
+      ? `<img class="spot-poster-img" src="${escapeHtml(posterSrc)}"
               alt="${escapeHtml(topic)} 宣傳海報"
               data-poster-idx="${idx}">`
       : buildPosterPlaceholder(c);
@@ -1217,6 +1551,19 @@ function buildCard(c, idx) {
     html += `<div class="credit-detail">` + c.details.map(d => `<span class="credit-detail-line">• ${escapeHtml(d)}</span>`).join("") + `</div>`;
   }
 
+  if (isAdmin) {
+    html += `<div class="card-admin-actions">
+      <button class="btn-card-mini btn-card-edit" data-edit-idx="${idx}">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        編輯
+      </button>
+      <button class="btn-card-mini btn-card-del" data-del-idx="${idx}">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a2 2 0 012-2h2a2 2 0 012 2v3"/></svg>
+        刪除
+      </button>
+    </div>`;
+  }
+
   html += `</div>
     <div class="course-actions">
       ${(!c.status) ? `<button class="btn-ics" data-card-idx="${idx}">
@@ -1278,6 +1625,26 @@ function render() {
       showToast("已加入行事曆 ✓");
     });
   });
+
+  // Admin edit/delete (only in admin mode)
+  if (isAdmin) {
+    listEl.querySelectorAll("[data-edit-idx]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const idx = Number(btn.dataset.editIdx);
+        const c = filteredCache[idx];
+        const realIdx = SCHEDULE[currentYear].courses.indexOf(c);
+        openCourseEditor(currentYear, realIdx);
+      });
+    });
+    listEl.querySelectorAll("[data-del-idx]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const idx = Number(btn.dataset.delIdx);
+        const c = filteredCache[idx];
+        const realIdx = SCHEDULE[currentYear].courses.indexOf(c);
+        deleteCourse(currentYear, realIdx);
+      });
+    });
+  }
 }
 
 /* =========================================================
@@ -1436,6 +1803,363 @@ $("lightbox").addEventListener("click", (e) => {
 });
 $("lightbox-close").addEventListener("click", (e) => { e.stopPropagation(); closeLightbox(); });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeLightbox(); });
+
+/* =========================================================
+ * 管理者後台
+ * ── 修改帳號密碼請編輯下方 ADMIN_CONFIG ──
+ * 注意：前端認證僅供「避免一般訪客誤改」，並非真正的安全機制。
+ *       任何能讀到此 HTML 原始碼的人都看得到密碼。
+ *       若需嚴格權限管理，請改用後端服務 + cookies/session。
+ * ========================================================= */
+const ADMIN_CONFIG = {
+  username: "admin",
+  password: "chimei2026"
+};
+
+const ADMIN_TAG_GROUPS = [
+  { label: "繼續教育學分", tags: ["專業","品質","倫理","性別"] },
+  { label: "臨床教師認證", tags: ["生理","健康促進","疾病預防","心理","醫學人文","敘事醫學","安寧","社會、長照","長照","六大核心","進階","教學技巧","數位賦能","倫理及法律"] },
+  { label: "CFD 點數", tags: ["CFD 核心","CFD 一般"] },
+  { label: "員工教育訓練", tags: ["醫學倫理","全人醫療","醫療品質","緩和醫療","健康識能","醫療相關法規","資訊安全","病人權利","危機管理","品質管理"] },
+  { label: "主管培育", tags: ["領導統御","行政管理與危機處理"] }
+];
+
+function openModal(id) { $(id).classList.add("show"); }
+function closeModal(id) { $(id).classList.remove("show"); }
+document.addEventListener("click", (e) => {
+  const t = e.target.closest("[data-close]");
+  if (t) closeModal(t.dataset.close);
+});
+
+// 登入
+$("btn-admin-login").addEventListener("click", () => {
+  openModal("login-modal");
+  setTimeout(() => $("login-user").focus(), 80);
+});
+$("btn-login-submit").addEventListener("click", attemptLogin);
+$("login-form").addEventListener("submit", attemptLogin);
+$("login-pass").addEventListener("keydown", (e) => { if (e.key === "Enter") attemptLogin(e); });
+
+function attemptLogin(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const u = $("login-user").value.trim();
+  const p = $("login-pass").value;
+  if (u === ADMIN_CONFIG.username && p === ADMIN_CONFIG.password) {
+    isAdmin = true;
+    document.body.classList.add("admin-mode");
+    $("admin-toolbar").classList.add("show");
+    closeModal("login-modal");
+    $("login-user").value = "";
+    $("login-pass").value = "";
+    $("login-error").textContent = "";
+    showToast("已登入管理者模式");
+    render();
+  } else {
+    $("login-error").textContent = "❌ 帳號或密碼錯誤";
+    $("login-pass").value = "";
+  }
+}
+
+// 登出
+$("btn-logout").addEventListener("click", () => {
+  if (!confirm("確定登出？任何尚未匯出的編輯都會留在記憶體中，重新整理頁面才會還原。")) return;
+  isAdmin = false;
+  document.body.classList.remove("admin-mode");
+  $("admin-toolbar").classList.remove("show");
+  showToast("已登出");
+  render();
+});
+
+// 新增 / 編輯
+$("btn-add-course").addEventListener("click", () => openCourseEditor(currentYear, null));
+$("btn-editor-save").addEventListener("click", saveCourseEdit);
+$("btn-editor-delete").addEventListener("click", () => {
+  if (!editCtx || editCtx.isNew) return;
+  deleteCourse(editCtx.year, editCtx.idx);
+  closeModal("editor-modal");
+});
+
+function openCourseEditor(year, idx) {
+  editCtx = { year: Number(year), idx, isNew: idx === null };
+  pendingPosterUpload = null;
+  fillYearSelect();
+  const course = idx === null ? null : SCHEDULE[year].courses[idx];
+  fillEditorForm(year, course);
+  $("editor-title").textContent = idx === null ? "新增課程" : `編輯課程：${course.date}（${course.weekday}）`;
+  $("btn-editor-delete").style.display = idx === null ? "none" : "inline-flex";
+  openModal("editor-modal");
+}
+
+function fillYearSelect() {
+  const sel = $("ed-year");
+  const years = Object.keys(SCHEDULE).sort((a,b)=>Number(b)-Number(a));
+  sel.innerHTML = years.map(y => `<option value="${y}">${y} 年度（${SCHEDULE[y].adYear}）</option>`).join("");
+}
+
+function fillEditorForm(year, c) {
+  $("ed-year").value = year;
+  $("ed-date").value = c?.date || "";
+  $("ed-weekday").value = c?.weekday || "";
+  $("ed-topic").value = c?.topic || "";
+  $("ed-speaker").value = c?.speaker || "";
+  $("ed-host").value = c?.host || "";
+  $("ed-tstart").value = c?.timeStart || "";
+  $("ed-tend").value = c?.timeEnd || "";
+  $("ed-note").value = c?.note || "";
+  $("ed-status").value = c?.status || "";
+  $("ed-details").value = (c?.details || []).join("\n");
+  $("ed-poster-path").textContent = c?.poster || "";
+  const previewSrc = c?._previewPoster || c?.poster || "";
+  renderEditorPoster(previewSrc);
+  $("ed-file").value = "";
+  renderTagCheckboxes(c?.tags || []);
+}
+
+function renderEditorPoster(src) {
+  const box = $("ed-poster-preview-box");
+  if (src) {
+    box.innerHTML = `<img src="${escapeHtml(src)}" alt="海報預覽" />`;
+  } else {
+    box.innerHTML = `<svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>`;
+  }
+}
+
+function renderTagCheckboxes(selectedTags) {
+  const wrap = $("ed-tags");
+  let html = "";
+  for (const group of ADMIN_TAG_GROUPS) {
+    html += `<div class="tag-group-label">${escapeHtml(group.label)}</div>`;
+    for (const t of group.tags) {
+      const on = selectedTags.includes(t);
+      html += `<label class="tag-cb ${on ? 'on' : ''}">
+        <input type="checkbox" value="${escapeHtml(t)}" ${on ? 'checked' : ''}>
+        ${escapeHtml(t)}
+      </label>`;
+    }
+  }
+  wrap.innerHTML = html;
+  wrap.querySelectorAll("input").forEach(cb => {
+    cb.addEventListener("change", () => {
+      cb.closest(".tag-cb").classList.toggle("on", cb.checked);
+    });
+  });
+}
+
+// 日期變更時自動帶入星期
+$("ed-date").addEventListener("input", autoUpdateWeekday);
+$("ed-year").addEventListener("change", autoUpdateWeekday);
+function autoUpdateWeekday() {
+  const date = $("ed-date").value.trim();
+  const year = $("ed-year").value;
+  if (!/^\d{1,2}\/\d{1,2}$/.test(date) || !SCHEDULE[year]) return;
+  const [m, d] = date.split("/").map(n => parseInt(n,10));
+  const ad = SCHEDULE[year].adYear;
+  const dt = new Date(ad, m-1, d);
+  if (!isNaN(dt.getTime())) $("ed-weekday").value = "日一二三四五六"[dt.getDay()];
+}
+
+// 海報上傳
+$("ed-file").addEventListener("change", handlePosterUpload);
+$("btn-poster-download").addEventListener("click", downloadPendingPoster);
+$("btn-poster-clear").addEventListener("click", () => {
+  pendingPosterUpload = null;
+  $("ed-file").value = "";
+  $("ed-poster-path").textContent = "";
+  renderEditorPoster("");
+});
+
+function handlePosterUpload(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    renderEditorPoster(ev.target.result);
+    // 推測檔名：年度+月+日 (如 1150624.jpg)
+    const date = $("ed-date").value.trim();
+    const year = $("ed-year").value;
+    let filename = file.name;
+    if (date && year && /^\d{1,2}\/\d{1,2}$/.test(date)) {
+      const [m, d] = date.split("/");
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+      filename = `${year}${m.padStart(2,'0')}${d.padStart(2,'0')}.${ext}`;
+    }
+    $("ed-poster-path").textContent = `posters/${filename}`;
+    pendingPosterUpload = { filename, dataUri: ev.target.result, file };
+    showToast("已載入海報，記得點「下載重命名後的海報」並放入 posters/");
+  };
+  reader.readAsDataURL(file);
+}
+
+function downloadPendingPoster() {
+  if (!pendingPosterUpload) { showToast("尚未選擇海報檔案"); return; }
+  const a = document.createElement("a");
+  a.href = pendingPosterUpload.dataUri;
+  a.download = pendingPosterUpload.filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  showToast(`已下載：${pendingPosterUpload.filename}`);
+}
+
+// 儲存課程
+function saveCourseEdit() {
+  const year = Number($("ed-year").value);
+  const date = $("ed-date").value.trim();
+  if (!date || !/^\d{1,2}\/\d{1,2}$/.test(date)) {
+    showToast("⚠️ 請輸入正確日期格式（例如 6/24）");
+    $("ed-date").focus(); return;
+  }
+  const weekday = $("ed-weekday").value.trim() || calcWeekday(year, date);
+  const tags = Array.from($("ed-tags").querySelectorAll("input:checked")).map(cb => cb.value);
+  const details = $("ed-details").value.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  const status = $("ed-status").value;
+  const course = { date, weekday, topic: $("ed-topic").value.trim(), speaker: $("ed-speaker").value.trim(), host: $("ed-host").value.trim() };
+  if (tags.length) course.tags = tags;
+  if (details.length) course.details = details;
+  if (status) course.status = status;
+  if ($("ed-tstart").value.trim()) course.timeStart = $("ed-tstart").value.trim();
+  if ($("ed-tend").value.trim()) course.timeEnd = $("ed-tend").value.trim();
+  if ($("ed-note").value.trim()) course.note = $("ed-note").value.trim();
+  const posterPath = $("ed-poster-path").textContent.trim();
+  if (posterPath) course.poster = posterPath;
+  if (pendingPosterUpload) {
+    course._previewPoster = pendingPosterUpload.dataUri;
+  } else if (!editCtx.isNew) {
+    // 保留舊的 preview (若有)
+    const old = SCHEDULE[editCtx.year].courses[editCtx.idx];
+    if (old?._previewPoster && old.poster === course.poster) {
+      course._previewPoster = old._previewPoster;
+    }
+  }
+
+  if (!SCHEDULE[year]) {
+    SCHEDULE[year] = {
+      adYear: 1911 + year, updated: "",
+      location: "第五醫療大樓五樓國際會議廳",
+      timeStart: "07:30", timeEnd: "08:30",
+      courses: []
+    };
+  }
+  if (editCtx.isNew || editCtx.year !== year) {
+    if (!editCtx.isNew) SCHEDULE[editCtx.year].courses.splice(editCtx.idx, 1);
+    SCHEDULE[year].courses.push(course);
+  } else {
+    SCHEDULE[year].courses[editCtx.idx] = course;
+  }
+  SCHEDULE[year].courses.sort(courseDateCompare);
+  closeModal("editor-modal");
+  if (year !== currentYear) { currentYear = year; renderYearTabs(); selectYear(year); }
+  else render();
+  showToast(editCtx.isNew ? "✓ 課程已新增" : "✓ 課程已更新");
+}
+
+function calcWeekday(year, dateStr) {
+  if (!SCHEDULE[year]) return "";
+  const [m, d] = dateStr.split("/").map(n => parseInt(n,10));
+  const dt = new Date(SCHEDULE[year].adYear, m-1, d);
+  return isNaN(dt.getTime()) ? "" : "日一二三四五六"[dt.getDay()];
+}
+function courseDateCompare(a, b) {
+  const [am, ad] = a.date.split("/").map(n => parseInt(n,10));
+  const [bm, bd] = b.date.split("/").map(n => parseInt(n,10));
+  return am !== bm ? am - bm : ad - bd;
+}
+
+// 刪除
+function deleteCourse(year, idx) {
+  const c = SCHEDULE[year].courses[idx];
+  if (!c) return;
+  if (!confirm(`確定刪除 ${year} 年 ${c.date}（${c.weekday}）「${c.topic || '本場'}」？此動作無法復原。`)) return;
+  SCHEDULE[year].courses.splice(idx, 1);
+  render();
+  showToast("已刪除");
+}
+
+// 匯出 HTML
+$("btn-export").addEventListener("click", exportHtml);
+async function exportHtml() {
+  const newBlock = formatScheduleAsJs(SCHEDULE);
+  const regex = /const SCHEDULE = \{[\s\S]*?\n\};/;
+  // 方法 A：透過 fetch 讀取目前頁面原始碼 → 替換 SCHEDULE → 下載
+  try {
+    showToast("產生更新版 HTML 中…");
+    const res = await fetch(window.location.href + "?t=" + Date.now(), { cache: "no-cache" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    let html = await res.text();
+    if (!regex.test(html)) throw new Error("找不到 SCHEDULE 區塊");
+    html = html.replace(regex, newBlock);
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "index.html";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+    showToast("✓ index.html 已下載，記得 commit 到 GitHub");
+    return;
+  } catch (e) {
+    console.warn("fetch 匯出失敗，改用剪貼簿備援：", e);
+  }
+  // 方法 B：剪貼簿備援 (適用 file:// 等無法 fetch 的情境)
+  try {
+    await navigator.clipboard.writeText(newBlock);
+    alert("無法自動產生 HTML（可能是本機檔案系統限制 fetch）。\n\n" +
+          "✓ 已將更新後的 const SCHEDULE = {...}; 程式碼複製到剪貼簿。\n\n" +
+          "請用編輯器打開 index.html，找到 const SCHEDULE = { 區塊，\n" +
+          "選取整段（從 const 到 };）後貼上覆蓋即可。\n\n" +
+          "完成後 commit 到 GitHub 就大功告成。");
+    showToast("✓ SCHEDULE 程式碼已複製到剪貼簿");
+  } catch (e2) {
+    console.error(e2);
+    showToast("❌ 匯出失敗：" + e2.message);
+  }
+}
+
+function formatScheduleAsJs(schedule) {
+  const years = Object.keys(schedule).sort((a,b)=>Number(b)-Number(a));
+  let s = "const SCHEDULE = {\n";
+  for (let i = 0; i < years.length; i++) {
+    const y = years[i];
+    const yr = schedule[y];
+    s += `  ${y}: {\n`;
+    s += `    adYear: ${yr.adYear},\n`;
+    s += `    updated: ${JSON.stringify(yr.updated || "")},\n`;
+    s += `    location: ${JSON.stringify(yr.location || "")},\n`;
+    s += `    timeStart: ${JSON.stringify(yr.timeStart || "07:30")},\n`;
+    s += `    timeEnd: ${JSON.stringify(yr.timeEnd || "08:30")},\n`;
+    s += `    courses: [\n`;
+    for (let j = 0; j < yr.courses.length; j++) {
+      const c = { ...yr.courses[j] };
+      delete c._previewPoster;  // 不匯出記憶體預覽
+      s += `      ${courseToLine(c)}${j < yr.courses.length-1 ? "," : ""}\n`;
+    }
+    s += `    ]\n`;
+    s += `  }${i < years.length-1 ? "," : ""}\n`;
+  }
+  s += "};";
+  return s;
+}
+
+function courseToLine(c) {
+  const order = ["date","weekday","status","topic","speaker","host","timeStart","timeEnd","note","poster","tags","details","special"];
+  const parts = [];
+  for (const k of order) {
+    if (c[k] === undefined || c[k] === null) continue;
+    if (Array.isArray(c[k])) {
+      if (c[k].length === 0) continue;
+      parts.push(`${k}:[${c[k].map(v => JSON.stringify(v)).join(",")}]`);
+    } else if (typeof c[k] === "string" && c[k] === "") {
+      continue;
+    } else {
+      parts.push(`${k}:${JSON.stringify(c[k])}`);
+    }
+  }
+  // 其他未列在 order 的欄位也保留
+  for (const [k, v] of Object.entries(c)) {
+    if (order.includes(k) || k === "_previewPoster") continue;
+    parts.push(`${k}:${JSON.stringify(v)}`);
+  }
+  return `{ ${parts.join(", ")} }`;
+}
 
 /* =========================================================
  * 啟動
