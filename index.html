@@ -916,6 +916,35 @@ const TAG_LABEL = {
 };
 const TAG_HIDDEN = new Set(["CFD 核心", "CFD 一般"]);
 
+/* 判斷標籤是否來自「臨床教師認證」(才標 CFD 前綴)。
+ * 規則：course.details 內必須有以「臨床教師認證」開頭/包含的行，且該行同時提到
+ *       此標籤的關鍵字（如「六大核心」、「B 類」、「數位賦能」…）才視為臨教學分。
+ * 例如 4/25 課程只有「員工教育訓練『數位賦能』1 學分」，不應顯示為 CFD 學分。
+ */
+const FACULTY_CERT_HINTS = {
+  "六大核心":   ["六大核心", "B 類", "B類"],
+  "進階":       ["進階"],
+  "生理":       ["生理"],
+  "健康促進":   ["健康促進"],
+  "疾病預防":   ["疾病預防"],
+  "心理":       ["心理"],
+  "醫學人文":   ["醫學人文"],
+  "敘事醫學":   ["敘事醫學"],
+  "安寧":       ["安寧"],
+  "社會、長照": ["社會、長照", "社會"],
+  "長照":       ["長照"],
+  "教學技巧":   ["教學技巧"],
+  "數位賦能":   ["數位賦能"],
+  "倫理及法律": ["倫理及法律", "倫理與法律"]
+};
+function isFacultyCertTag(tag, details) {
+  const hints = FACULTY_CERT_HINTS[tag];
+  if (!hints) return false;
+  return (details || []).some(line =>
+    line.includes("臨床教師認證") && hints.some(h => line.includes(h))
+  );
+}
+
 /* =========================================================
  * 狀態
  * ========================================================= */
@@ -1178,7 +1207,8 @@ function buildCard(c, idx) {
   const visibleTags = (c.tags || []).filter(t => !TAG_HIDDEN.has(t));
   if (visibleTags.length) {
     html += `<div class="credit-tags">` + visibleTags.map(t => {
-      const label = TAG_LABEL[t] || t;
+      // 只有 details 裡有「臨床教師認證」對應描述時，才掛 CFD 前綴
+      const label = (TAG_LABEL[t] && isFacultyCertTag(t, c.details)) ? TAG_LABEL[t] : t;
       return `<span class="credit-tag">${escapeHtml(label)}</span>`;
     }).join("") + `</div>`;
   }
