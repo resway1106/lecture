@@ -785,6 +785,33 @@
 
   body.admin-mode { padding-bottom: 80px; }
 
+  /* 載入畫面 (Sheet 模式啟動時) */
+  .loading-overlay {
+    position: fixed; inset: 0;
+    background: linear-gradient(135deg, #f0f9fb 0%, #fdf6f1 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 2000; gap: 16px;
+    transition: opacity 0.3s, visibility 0.3s;
+  }
+  .loading-overlay.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+  .loading-spinner {
+    width: 48px; height: 48px;
+    border: 4px solid var(--gray-200);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { color: var(--gray-700); font-size: 14px; font-weight: 500; }
+  .loading-error {
+    color: #dc2626; margin-top: 12px; max-width: 480px;
+    text-align: center; font-size: 13px; line-height: 1.6;
+    background: #fee2e2; padding: 14px 20px; border-radius: 10px;
+    border: 1px solid #fca5a5;
+    white-space: pre-wrap;
+  }
+
   @media (max-width: 640px) {
     header { padding: 28px 0 64px; }
     .spotlight { padding: 20px; margin-top: -36px; }
@@ -804,6 +831,12 @@
 </style>
 </head>
 <body>
+
+<div class="loading-overlay hide" id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text" id="loading-text">載入中…</div>
+  <div class="loading-error" id="loading-error" style="display:none"></div>
+</div>
 
 <header>
   <div class="container header-content">
@@ -1100,6 +1133,10 @@
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
     匯出更新版 HTML
   </button>
+  <button class="btn-tb" id="btn-export-csv" title="把目前的記憶體資料匯出成 Google Sheet 可匯入的 CSV (協助首次設定 Sheet)">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-6h13M9 11V5h13M3 7h2M3 11h2M3 15h2M3 19h2"/></svg>
+    產出 Sheet 匯入檔
+  </button>
   <div class="divider"></div>
   <button class="btn-tb" id="btn-logout">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
@@ -1115,10 +1152,24 @@
 
 <script>
 /* =========================================================
- * 課程資料 — 依年度組織。未來年度只要新增一個 key (e.g. 116)
- * 即會自動出現年度切換 tab。
+ * Google Sheet 後端設定
+ * ─────────────────────────────────────────────
+ * 設定方式詳見 SETUP.md。設定步驟：
+ *   1. 建立 Google Sheet (Years / Courses / Auth 三個工作表)
+ *   2. 在 Sheet 部署 apps-script.gs 為「網頁應用程式」
+ *   3. 把部署後得到的 URL 貼到下面 APPS_SCRIPT_URL
+ *
+ * 未設定 URL 時：使用本檔內嵌的 SCHEDULE 與 ADMIN_CONFIG (離線模式)
+ * 設定後：所有資料即時從 Sheet 讀寫，內嵌資料僅作為備援
  * ========================================================= */
-const SCHEDULE = {
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZBLLy1aYthlSk989b3jQnZnW0-8bPZ_fVUEbq3jJDfMnph9NrNdwhKBcsUPSopCbD/exec";
+const USE_SHEET = !!APPS_SCRIPT_URL;
+
+/* =========================================================
+ * 課程資料 — 內嵌版本 (離線模式 / 初始備援)
+ * USE_SHEET=true 時會被從 Google Sheet 載入的資料覆蓋
+ * ========================================================= */
+let SCHEDULE = {
   115: {
     adYear: 2026,
     updated: "115.06.02",
@@ -1863,6 +1914,87 @@ async function sha256Hex(text) {
   return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
+/* =========================================================
+ * Google Sheet API 助手
+ * ========================================================= */
+let sessionPasswordHash = sessionStorage.getItem("adminHash") || null;
+
+async function callApi(action, payload = {}) {
+  if (!APPS_SCRIPT_URL) throw new Error("尚未設定 APPS_SCRIPT_URL");
+  const body = JSON.stringify({ action, ...payload });
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" }, // 避開 CORS preflight
+    body
+  });
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  const result = await res.json();
+  if (!result.ok) throw new Error(result.error || "未知錯誤");
+  return result.data;
+}
+
+async function loadFromSheet() {
+  const data = await callApi("read");
+  SCHEDULE = buildScheduleFromSheet(data);
+}
+
+function buildScheduleFromSheet({ years, courses }) {
+  const out = {};
+  for (const y of (years || [])) {
+    if (!y.year) continue;
+    out[y.year] = {
+      adYear:    Number(y.adYear) || (1911 + Number(y.year)),
+      updated:   y.updated || "",
+      location:  y.location || "第五醫療大樓五樓國際會議廳",
+      timeStart: y.timeStart || "07:30",
+      timeEnd:   y.timeEnd || "08:30",
+      courses: []
+    };
+  }
+  for (const c of (courses || [])) {
+    const year = String(c.year);
+    if (!out[year]) continue;
+    const course = { id: c.id, date: String(c.date || ""), weekday: String(c.weekday || "") };
+    if (c.status) course.status = String(c.status);
+    if (c.topic) course.topic = String(c.topic);
+    if (c.speaker) course.speaker = String(c.speaker);
+    if (c.host) course.host = String(c.host);
+    if (c.timeStart) course.timeStart = String(c.timeStart);
+    if (c.timeEnd) course.timeEnd = String(c.timeEnd);
+    if (c.poster) course.poster = String(c.poster);
+    if (c.tags)    course.tags    = String(c.tags).split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+    if (c.details) course.details = String(c.details).split(/\n+/).map(s => s.trim()).filter(Boolean);
+    if (c.note) course.note = String(c.note);
+    if (c.special) course.special = String(c.special);
+    if (c.skeleton === "yes" || c.skeleton === true || c.skeleton === "TRUE") course._skeleton = true;
+    out[year].courses.push(course);
+  }
+  // Sort
+  for (const y in out) {
+    out[y].courses.sort((a, b) => {
+      const [am, ad] = a.date.split("/").map(n => parseInt(n, 10));
+      const [bm, bd] = b.date.split("/").map(n => parseInt(n, 10));
+      return am !== bm ? am - bm : ad - bd;
+    });
+  }
+  return out;
+}
+
+function showLoading(text) {
+  $("loading-overlay").classList.remove("hide");
+  if (text) $("loading-text").textContent = text;
+  $("loading-error").style.display = "none";
+}
+function hideLoading() { $("loading-overlay").classList.add("hide"); }
+function showLoadError(msg) {
+  $("loading-overlay").classList.remove("hide");
+  $("loading-text").textContent = "載入失敗";
+  const errEl = $("loading-error");
+  errEl.style.display = "block";
+  errEl.innerHTML = `<div style="margin-bottom:10px">${escapeHtml(msg)}</div>` +
+    `<button class="btn-form btn-form-primary" onclick="location.reload()">重新整理</button>`;
+}
+
 const ADMIN_TAG_GROUPS = [
   { label: "繼續教育學分", tags: ["專業","品質","倫理","性別"] },
   { label: "臨床教師認證", tags: ["生理","健康促進","疾病預防","心理","醫學人文","敘事醫學","安寧","社會、長照","長照","六大核心","進階","教學技巧","數位賦能","倫理及法律"] },
@@ -1893,15 +2025,34 @@ async function attemptLogin(e) {
   const u = $("login-user").value.trim();
   const p = $("login-pass").value;
   const hash = await sha256Hex(p);
-  if (u === ADMIN_CONFIG.username && hash === ADMIN_CONFIG.passwordHash) {
+  $("login-error").textContent = "";
+
+  let ok = false;
+  let displayName = "";
+  if (USE_SHEET) {
+    // 透過 Apps Script 驗證 (帳密存在 Sheet 的 Auth 工作表)
+    try {
+      const result = await callApi("login", { passwordHash: hash });
+      ok = (!u || result.username === u);  // 若使用者填了帳號也要對得上
+      displayName = result.displayName || result.username;
+    } catch (err) {
+      ok = false;
+    }
+  } else {
+    // 離線模式：對照本檔內嵌的 ADMIN_CONFIG
+    ok = (u === ADMIN_CONFIG.username && hash === ADMIN_CONFIG.passwordHash);
+  }
+
+  if (ok) {
+    sessionPasswordHash = hash;
+    sessionStorage.setItem("adminHash", hash);
     isAdmin = true;
     document.body.classList.add("admin-mode");
     $("admin-toolbar").classList.add("show");
     closeModal("login-modal");
     $("login-user").value = "";
     $("login-pass").value = "";
-    $("login-error").textContent = "";
-    showToast("已登入管理者模式");
+    showToast(displayName ? `已登入：${displayName}` : "已登入管理者模式");
     render();
   } else {
     $("login-error").textContent = "❌ 帳號或密碼錯誤";
@@ -1928,8 +2079,13 @@ async function genPasswordHash() {
 
 // 登出
 $("btn-logout").addEventListener("click", () => {
-  if (!confirm("確定登出？任何尚未匯出的編輯都會留在記憶體中，重新整理頁面才會還原。")) return;
+  const msg = USE_SHEET
+    ? "確定登出？"
+    : "確定登出？任何尚未匯出的編輯都會留在記憶體中，重新整理頁面才會還原。";
+  if (!confirm(msg)) return;
   isAdmin = false;
+  sessionPasswordHash = null;
+  sessionStorage.removeItem("adminHash");
   document.body.classList.remove("admin-mode");
   $("admin-toolbar").classList.remove("show");
   showToast("已登出");
@@ -2068,7 +2224,7 @@ function downloadPendingPoster() {
 }
 
 // 儲存課程
-function saveCourseEdit() {
+async function saveCourseEdit() {
   const year = Number($("ed-year").value);
   const date = $("ed-date").value.trim();
   if (!date || !/^\d{1,2}\/\d{1,2}$/.test(date)) {
@@ -2091,16 +2247,17 @@ function saveCourseEdit() {
   if (pendingPosterUpload) {
     course._previewPoster = pendingPosterUpload.dataUri;
   } else if (!editCtx.isNew) {
-    // 保留舊的 preview (若有)
     const old = SCHEDULE[editCtx.year].courses[editCtx.idx];
     if (old?._previewPoster && old.poster === course.poster) {
       course._previewPoster = old._previewPoster;
     }
   }
-  // 若原本是「自動產出骨架」且這次仍沒填入主題，保留骨架標記 (不對公開頁面顯示)
+  // 保留 skeleton（編輯後仍空白主題）
   if (!editCtx.isNew) {
     const old = SCHEDULE[editCtx.year].courses[editCtx.idx];
     if (old?._skeleton && !course.topic) course._skeleton = true;
+    // 保留原本的 id (Sheet 模式)
+    if (old?.id) course.id = old.id;
   }
 
   if (!SCHEDULE[year]) {
@@ -2111,6 +2268,21 @@ function saveCourseEdit() {
       courses: []
     };
   }
+
+  // Sheet 模式 → 先寫回 Sheet，成功後再更新本地
+  if (USE_SHEET) {
+    try {
+      showToast("儲存中…");
+      const payload = { ...course, year };
+      delete payload._previewPoster; // 不傳上 Sheet
+      const saved = await callApi("saveCourse", { course: payload, passwordHash: sessionPasswordHash });
+      if (saved && saved.id) course.id = saved.id;
+    } catch (e) {
+      showToast("❌ 儲存失敗：" + e.message);
+      return;
+    }
+  }
+
   if (editCtx.isNew || editCtx.year !== year) {
     if (!editCtx.isNew) SCHEDULE[editCtx.year].courses.splice(editCtx.idx, 1);
     SCHEDULE[year].courses.push(course);
@@ -2121,7 +2293,9 @@ function saveCourseEdit() {
   closeModal("editor-modal");
   if (year !== currentYear) { currentYear = year; renderYearTabs(); selectYear(year); }
   else render();
-  showToast(editCtx.isNew ? "✓ 課程已新增" : "✓ 課程已更新");
+  showToast(USE_SHEET
+    ? (editCtx.isNew ? "✓ 已寫入 Sheet" : "✓ 已更新 Sheet")
+    : (editCtx.isNew ? "✓ 課程已新增 (記憶體)" : "✓ 課程已更新 (記憶體)"));
 }
 
 function calcWeekday(year, dateStr) {
@@ -2137,17 +2311,79 @@ function courseDateCompare(a, b) {
 }
 
 // 刪除
-function deleteCourse(year, idx) {
+async function deleteCourse(year, idx) {
   const c = SCHEDULE[year].courses[idx];
   if (!c) return;
   if (!confirm(`確定刪除 ${year} 年 ${c.date}（${c.weekday}）「${c.topic || '本場'}」？此動作無法復原。`)) return;
+  if (USE_SHEET) {
+    if (!c.id) { showToast("⚠️ 此課程缺少 id，無法從 Sheet 刪除"); return; }
+    try {
+      showToast("刪除中…");
+      await callApi("deleteCourse", { id: c.id, passwordHash: sessionPasswordHash });
+    } catch (e) {
+      showToast("❌ 刪除失敗：" + e.message);
+      return;
+    }
+  }
   SCHEDULE[year].courses.splice(idx, 1);
   render();
-  showToast("已刪除");
+  showToast(USE_SHEET ? "✓ 已從 Sheet 刪除" : "已刪除 (記憶體)");
 }
 
 // 匯出 HTML
 $("btn-export").addEventListener("click", exportHtml);
+
+// 匯出 Sheet 匯入用 CSV (3 個檔)
+$("btn-export-csv").addEventListener("click", exportSheetCsv);
+function csvEscape(v) {
+  v = String(v ?? "");
+  if (/[",\n\r]/.test(v)) return '"' + v.replace(/"/g, '""') + '"';
+  return v;
+}
+function downloadFile(name, content, mime) {
+  const blob = new Blob(["﻿" + content], { type: (mime || "text/plain") + ";charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+function exportSheetCsv() {
+  // Years
+  const yHead = ["year","adYear","updated","location","timeStart","timeEnd"];
+  const yRows = [yHead.join(",")];
+  for (const y of Object.keys(SCHEDULE).sort((a,b)=>Number(a)-Number(b))) {
+    const yr = SCHEDULE[y];
+    yRows.push([y, yr.adYear, yr.updated||"", yr.location||"", yr.timeStart||"", yr.timeEnd||""].map(csvEscape).join(","));
+  }
+  downloadFile("years.csv", yRows.join("\n"), "text/csv");
+
+  // Courses
+  const cHead = ["id","year","date","weekday","status","topic","speaker","host","timeStart","timeEnd","poster","tags","details","note","special","skeleton"];
+  const cRows = [cHead.join(",")];
+  let id = 1;
+  for (const y of Object.keys(SCHEDULE).sort((a,b)=>Number(a)-Number(b))) {
+    for (const c of SCHEDULE[y].courses) {
+      cRows.push([
+        id++, y,
+        c.date||"", c.weekday||"", c.status||"",
+        c.topic||"", c.speaker||"", c.host||"",
+        c.timeStart||"", c.timeEnd||"", c.poster||"",
+        (c.tags||[]).join("\n"),
+        (c.details||[]).join("\n"),
+        c.note||"", c.special||"",
+        c._skeleton ? "yes" : ""
+      ].map(csvEscape).join(","));
+    }
+  }
+  downloadFile("courses.csv", cRows.join("\n"), "text/csv");
+
+  // Auth (預設一筆 admin / chimei2026)
+  const authCsv = "username,passwordHash,displayName\nadmin,da4c31ae5a3b30d9774a2c2eafac5d725d25abe4e18f6e35bc452d428ea3618c,管理者";
+  downloadFile("auth.csv", authCsv, "text/csv");
+
+  showToast("✓ 已下載 years.csv / courses.csv / auth.csv，請依 SETUP.md 步驟 4 匯入 Sheet");
+}
 async function exportHtml() {
   const newBlock = formatScheduleAsJs(SCHEDULE);
   const regex = /const SCHEDULE = \{[\s\S]*?\n\};/;
@@ -2328,9 +2564,27 @@ function generateDefaultSchedule(twYear) {
   return out;
 }
 
-$("btn-autogen").addEventListener("click", () => {
+$("btn-autogen").addEventListener("click", async () => {
   if (!isAdmin) return;
   if (!confirm(`即將為 ${currentYear} 年度 (${SCHEDULE[currentYear].adYear}) 自動產出 36 個預設場次，確定執行？\n\n您稍後可逐場編輯主題、講師等資訊。`)) return;
+
+  if (USE_SHEET) {
+    // 由 Apps Script 在伺服器端產生並寫入 Sheet
+    try {
+      showToast("產生中…");
+      await callApi("autogen", { year: currentYear, passwordHash: sessionPasswordHash });
+      // 重新從 Sheet 載入以取得新列的 id
+      await loadFromSheet();
+      render();
+      renderYearTabs();
+      showToast(`✓ 已寫入 Sheet，可開始編輯`);
+    } catch (e) {
+      showToast("❌ 失敗：" + e.message);
+    }
+    return;
+  }
+
+  // 離線模式
   SCHEDULE[currentYear].courses = generateDefaultSchedule(currentYear);
   if (!SCHEDULE[currentYear].updated || SCHEDULE[currentYear].updated === "尚未公告") {
     const now = new Date();
@@ -2339,15 +2593,45 @@ $("btn-autogen").addEventListener("click", () => {
   $("meta-updated").textContent = `更新日期：${SCHEDULE[currentYear].updated}`;
   render();
   renderYearTabs();
-  showToast(`✓ 已產出 36 個待公告場次，可開始編輯`);
+  showToast(`✓ 已產出 36 個待公告場次 (記憶體)`);
 });
 
 /* =========================================================
  * 啟動
  * ========================================================= */
-(function init() {
+(async function init() {
+  // Sheet 模式 → 先從 Apps Script 撈資料
+  if (USE_SHEET) {
+    showLoading("正在從 Google Sheet 載入課程資料…");
+    try {
+      await loadFromSheet();
+    } catch (e) {
+      console.error("Load from Sheet failed:", e);
+      showLoadError("無法載入 Sheet 資料：" + e.message +
+        "\n\n請檢查 APPS_SCRIPT_URL 是否正確、Apps Script 部署是否啟用。");
+      return;
+    }
+    // 若 session 有快取的 hash，嘗試自動登入
+    if (sessionPasswordHash) {
+      try {
+        await callApi("login", { passwordHash: sessionPasswordHash });
+        isAdmin = true;
+        document.body.classList.add("admin-mode");
+        $("admin-toolbar").classList.add("show");
+      } catch {
+        sessionStorage.removeItem("adminHash");
+        sessionPasswordHash = null;
+      }
+    }
+    hideLoading();
+  }
+
   // 預設選擇本西元年對應的年度（若有）；否則選最新有資料的年度
   const years = Object.keys(SCHEDULE).map(Number).sort((a,b)=>b-a);
+  if (years.length === 0) {
+    showLoadError("Sheet 中沒有任何年度資料。請至 Google Sheet 的 Years 工作表新增列。");
+    return;
+  }
   const matchYear = years.find(y => SCHEDULE[y].adYear === TODAY_AD_YEAR);
   const yearWithData = years.find(y => SCHEDULE[y].courses && SCHEDULE[y].courses.length > 0);
   currentYear = matchYear || yearWithData || years[0];
