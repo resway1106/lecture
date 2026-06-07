@@ -1053,23 +1053,19 @@
           <svg viewBox="0 0 24 24" fill="none"><path d="M6 3v3M18 3v3M3 9h18M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z" stroke="#4285F4" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="14" r="2.5" fill="#EA4335"/></svg>
           <div>
             <div class="cal-opt-name">Google 日曆</div>
-            <div class="cal-opt-desc">開新分頁，自動帶入活動資料</div>
-          </div>
-        </a>
-        <a class="cal-opt" id="cal-outlook" href="#" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="#0078D4" stroke-width="2"/><path d="M7 12l3 3 7-7" stroke="#0078D4" stroke-width="2" stroke-linecap="round"/></svg>
-          <div>
-            <div class="cal-opt-name">Outlook 日曆</div>
-            <div class="cal-opt-desc">開新分頁，自動帶入活動資料</div>
+            <div class="cal-opt-desc">Gmail / Workspace 帳號，直接帶入</div>
           </div>
         </a>
         <button class="cal-opt" id="cal-ics">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke="#0a6b7c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="#0078D4" stroke-width="2"/><path d="M7 12l3 3 7-7" stroke="#0078D4" stroke-width="2" stroke-linecap="round"/></svg>
           <div>
             <div class="cal-opt-name">下載 .ics 檔</div>
-            <div class="cal-opt-desc">適用 Apple 行事曆、Thunderbird 等其他軟體</div>
+            <div class="cal-opt-desc">下載後雙擊即可加入：Outlook（桌面 / 365 / 個人）、Apple 行事曆、Thunderbird 等</div>
           </div>
         </button>
+      </div>
+      <div class="form-hint" style="margin-top:14px; line-height:1.6">
+        💡 <strong>Outlook 使用者請選「下載 .ics 檔」</strong>：下載後雙擊即可在你的 Outlook（桌面版或網頁版）開啟並儲存活動，比起網頁 deep link 更可靠（不會因為登入流程中斷而失敗）。
       </div>
     </div>
   </div>
@@ -1959,15 +1955,9 @@ function buildCalendarLinks(course, twYear) {
     action: "TEMPLATE", text: title, dates: dtUtc,
     details: description, location, ctz: "Asia/Taipei"
   });
-  const outlookParams = new URLSearchParams({
-    path: "/calendar/action/compose", rru: "addevent",
-    subject: title, startdt: isoLocal(sh, sm), enddt: isoLocal(eh, em),
-    body: description, location
-  });
 
   return {
-    google:  `https://calendar.google.com/calendar/render?${googleParams}`,
-    outlook: `https://outlook.live.com/calendar/0/deeplink/compose?${outlookParams}`
+    google: `https://calendar.google.com/calendar/render?${googleParams}`
   };
 }
 
@@ -1983,8 +1973,7 @@ function openCalMenu(course, twYear) {
     `<div class="cal-event-title">${escapeHtml(topic)}</div>` +
     `<div class="cal-event-time">${escapeHtml(course.date)}（${escapeHtml(course.weekday || "")}）　${escapeHtml(tStart)}–${escapeHtml(tEnd)}</div>`;
   const links = buildCalendarLinks(course, twYear);
-  $("cal-google").href  = links.google;
-  $("cal-outlook").href = links.outlook;
+  $("cal-google").href = links.google;
   openModal("cal-modal");
 }
 
@@ -2064,9 +2053,6 @@ $("cal-ics").addEventListener("click", () => {
 });
 $("cal-google").addEventListener("click", () => {
   setTimeout(() => { closeModal("cal-modal"); showToast("已開啟 Google 日曆"); }, 100);
-});
-$("cal-outlook").addEventListener("click", () => {
-  setTimeout(() => { closeModal("cal-modal"); showToast("已開啟 Outlook 日曆"); }, 100);
 });
 
 /* =========================================================
