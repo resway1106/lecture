@@ -747,11 +747,12 @@
   }
   .admin-toolbar .btn-tb {
     background: rgba(255,255,255,0.12); color: #fff;
-    border: none; padding: 8px 14px; border-radius: 50px;
+    border: none; padding: 8px 18px; border-radius: 50px;
     font-size: 13px; font-weight: 600;
     cursor: pointer; font-family: inherit;
-    display: flex; align-items: center; gap: 5px;
+    display: inline-flex; align-items: center; gap: 6px;
     transition: background 0.15s;
+    white-space: nowrap;
   }
   .admin-toolbar .btn-tb:hover { background: rgba(255,255,255,0.22); }
   .admin-toolbar .btn-tb svg { width: 14px; height: 14px; }
@@ -773,10 +774,10 @@
   }
   body.admin-mode .card-admin-actions { display: flex; }
   .btn-card-mini {
-    font-size: 12px; padding: 5px 11px; border-radius: 6px;
+    font-size: 12px; padding: 5px 14px; border-radius: 6px;
     border: 1px solid; cursor: pointer; font-family: inherit;
-    font-weight: 600; display: inline-flex; align-items: center; gap: 4px;
-    transition: all 0.15s;
+    font-weight: 600; display: inline-flex; align-items: center; gap: 5px;
+    transition: all 0.15s; white-space: nowrap;
   }
   .btn-card-edit { background: var(--primary-light); color: var(--primary-dark); border-color: #b6dde5; }
   .btn-card-edit:hover { background: var(--primary); color: #fff; }
@@ -1003,6 +1004,10 @@
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
           一鍵加入全部
         </button>
+        <button class="btn-batch" id="btn-word" title="下載本年度課程一覽 Word 檔" style="background:#1f6feb">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          下載 Word 一覽
+        </button>
       </div>
     </div>
   </div>
@@ -1205,14 +1210,6 @@
   <button class="btn-tb" id="btn-add-course">
     <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
     新增課程
-  </button>
-  <button class="btn-tb" id="btn-export">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
-    匯出更新版 HTML
-  </button>
-  <button class="btn-tb" id="btn-export-csv" title="把目前的記憶體資料匯出成 Google Sheet 可匯入的 CSV (協助首次設定 Sheet)">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-6h13M9 11V5h13M3 7h2M3 11h2M3 15h2M3 19h2"/></svg>
-    產出 Sheet 匯入檔
   </button>
   <div class="divider"></div>
   <button class="btn-tb" id="btn-logout">
@@ -2042,6 +2039,8 @@ $("btn-batch").addEventListener("click", () => {
   showToast(`已產生 ${valid.length} 場課程的行事曆檔`);
 });
 
+$("btn-word").addEventListener("click", exportYearAsWord);
+
 // Lightbox 關閉
 $("lightbox").addEventListener("click", (e) => {
   if (e.target.id !== "lightbox-img") closeLightbox();
@@ -2511,142 +2510,119 @@ async function deleteCourse(year, idx) {
   showToast(USE_SHEET ? "✓ 已從 Sheet 刪除" : "已刪除 (記憶體)");
 }
 
-// 匯出 HTML
-$("btn-export").addEventListener("click", exportHtml);
+/* =========================================================
+ * 下載年度課程一覽 Word 檔
+ * 產生與原版 PDF 相同結構的 .doc 檔 (HTML/Word 相容格式)
+ * ========================================================= */
+function exportYearAsWord() {
+  const twYear = currentYear;
+  const yr = SCHEDULE[twYear];
+  if (!yr) { showToast("⚠️ 無資料"); return; }
+  // 取非 skeleton 課程，依日期排序
+  const courses = (yr.courses || []).filter(c => !c._skeleton).sort(courseDateCompare);
+  if (courses.length === 0) { showToast("⚠️ 此年度尚無課程"); return; }
 
-// 匯出 Sheet 匯入用 CSV (3 個檔)
-$("btn-export-csv").addEventListener("click", exportSheetCsv);
-function csvEscape(v) {
-  v = String(v ?? "");
-  if (/[",\n\r]/.test(v)) return '"' + v.replace(/"/g, '""') + '"';
-  return v;
-}
-function downloadFile(name, content, mime) {
-  const blob = new Blob(["﻿" + content], { type: (mime || "text/plain") + ";charset=utf-8" });
+  const title = `${twYear} 年 全院教學活動時間表`;
+  const rowsHtml = courses.map(buildWordRow).join("");
+
+  const html = `<!DOCTYPE html>
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset="UTF-8">
+<title>${escapeHtml(title)}</title>
+<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+<style>
+@page { size: A4; margin: 1.8cm 2cm; }
+body { font-family: "Microsoft JhengHei", "新細明體", "PMingLiU", sans-serif; font-size: 11pt; line-height: 1.5; color: #1c1917; }
+h1 { text-align: center; font-size: 20pt; margin: 0 0 14pt 0; letter-spacing: 1pt; }
+.info { font-size: 10.5pt; margin-bottom: 10pt; padding: 0 2pt; }
+.info-row { display: flex; justify-content: space-between; }
+.info-left strong { letter-spacing: 1pt; }
+.info-update { text-align: right; }
+table { border-collapse: collapse; width: 100%; }
+td, th { border: 1px solid #555; padding: 6pt 8pt; vertical-align: top; }
+th { background: #d9e2f3; font-weight: bold; text-align: center; font-size: 11pt; letter-spacing: 2pt; }
+.date-cell { text-align: center; white-space: nowrap; font-weight: bold; color: #0a6b7c; }
+.topic-cell { font-weight: 600; }
+.credit-row td { font-size: 9.5pt; color: #555; padding: 4pt 8pt 4pt 16pt; background: #fafaf9; }
+.credit-row p { margin: 1pt 0; }
+.cancelled { color: #991b1b; }
+.holiday { color: #92400e; }
+.tba { color: #6b7280; font-style: italic; }
+</style>
+</head>
+<body>
+
+<h1>${escapeHtml(title)}</h1>
+
+<div class="info">
+  <div class="info-row">
+    <div class="info-left">
+      時間：<strong>${escapeHtml(yr.timeStart || "07:30")}~${escapeHtml(yr.timeEnd || "08:30")}</strong>
+      地點：<strong>${escapeHtml(yr.location || "")}</strong>
+    </div>
+    <div class="info-update">更新日期：${escapeHtml(yr.updated || "")}</div>
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:12%">日 期</th>
+      <th style="width:38%">主 　 題</th>
+      <th style="width:28%">主 講 者</th>
+      <th style="width:22%">主 持 人</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${rowsHtml}
+  </tbody>
+</table>
+
+<p style="margin-top:14pt; font-size:9pt; color:#6b7280; text-align:right">
+  奇美醫療財團法人奇美醫院 教學部 ・ 全院演講
+</p>
+
+</body>
+</html>`;
+
+  const blob = new Blob(["﻿" + html], { type: "application/msword;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url; a.download = name;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  a.href = url;
+  a.download = `${twYear}年全院教學活動時間表.doc`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 1500);
-}
-function exportSheetCsv() {
-  // Years
-  const yHead = ["year","adYear","updated","location","timeStart","timeEnd"];
-  const yRows = [yHead.join(",")];
-  for (const y of Object.keys(SCHEDULE).sort((a,b)=>Number(a)-Number(b))) {
-    const yr = SCHEDULE[y];
-    yRows.push([y, yr.adYear, yr.updated||"", yr.location||"", yr.timeStart||"", yr.timeEnd||""].map(csvEscape).join(","));
-  }
-  downloadFile("years.csv", yRows.join("\n"), "text/csv");
-
-  // Courses
-  const cHead = ["id","year","date","weekday","status","topic","speaker","host","timeStart","timeEnd","poster","tags","details","note","special","skeleton"];
-  const cRows = [cHead.join(",")];
-  let id = 1;
-  for (const y of Object.keys(SCHEDULE).sort((a,b)=>Number(a)-Number(b))) {
-    for (const c of SCHEDULE[y].courses) {
-      cRows.push([
-        id++, y,
-        c.date||"", c.weekday||"", c.status||"",
-        c.topic||"", c.speaker||"", c.host||"",
-        c.timeStart||"", c.timeEnd||"", c.poster||"",
-        (c.tags||[]).join("\n"),
-        (c.details||[]).join("\n"),
-        c.note||"", c.special||"",
-        c._skeleton ? "yes" : ""
-      ].map(csvEscape).join(","));
-    }
-  }
-  downloadFile("courses.csv", cRows.join("\n"), "text/csv");
-
-  // Auth (預設一筆 admin / chimei2026)
-  const authCsv = "username,passwordHash,displayName\nadmin,da4c31ae5a3b30d9774a2c2eafac5d725d25abe4e18f6e35bc452d428ea3618c,管理者";
-  downloadFile("auth.csv", authCsv, "text/csv");
-
-  showToast("✓ 已下載 years.csv / courses.csv / auth.csv，請依 SETUP.md 步驟 4 匯入 Sheet");
-}
-async function exportHtml() {
-  const newBlock = formatScheduleAsJs(SCHEDULE);
-  const regex = /const SCHEDULE = \{[\s\S]*?\n\};/;
-  // 方法 A：透過 fetch 讀取目前頁面原始碼 → 替換 SCHEDULE → 下載
-  try {
-    showToast("產生更新版 HTML 中…");
-    const res = await fetch(window.location.href + "?t=" + Date.now(), { cache: "no-cache" });
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    let html = await res.text();
-    if (!regex.test(html)) throw new Error("找不到 SCHEDULE 區塊");
-    html = html.replace(regex, newBlock);
-    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = "index.html";
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 1500);
-    showToast("✓ index.html 已下載，記得 commit 到 GitHub");
-    return;
-  } catch (e) {
-    console.warn("fetch 匯出失敗，改用剪貼簿備援：", e);
-  }
-  // 方法 B：剪貼簿備援 (適用 file:// 等無法 fetch 的情境)
-  try {
-    await navigator.clipboard.writeText(newBlock);
-    alert("無法自動產生 HTML（可能是本機檔案系統限制 fetch）。\n\n" +
-          "✓ 已將更新後的 const SCHEDULE = {...}; 程式碼複製到剪貼簿。\n\n" +
-          "請用編輯器打開 index.html，找到 const SCHEDULE = { 區塊，\n" +
-          "選取整段（從 const 到 };）後貼上覆蓋即可。\n\n" +
-          "完成後 commit 到 GitHub 就大功告成。");
-    showToast("✓ SCHEDULE 程式碼已複製到剪貼簿");
-  } catch (e2) {
-    console.error(e2);
-    showToast("❌ 匯出失敗：" + e2.message);
-  }
+  showToast(`✓ 已下載 ${twYear} 年度 Word 檔`);
 }
 
-function formatScheduleAsJs(schedule) {
-  const years = Object.keys(schedule).sort((a,b)=>Number(b)-Number(a));
-  let s = "const SCHEDULE = {\n";
-  for (let i = 0; i < years.length; i++) {
-    const y = years[i];
-    const yr = schedule[y];
-    s += `  ${y}: {\n`;
-    s += `    adYear: ${yr.adYear},\n`;
-    s += `    updated: ${JSON.stringify(yr.updated || "")},\n`;
-    s += `    location: ${JSON.stringify(yr.location || "")},\n`;
-    s += `    timeStart: ${JSON.stringify(yr.timeStart || "07:30")},\n`;
-    s += `    timeEnd: ${JSON.stringify(yr.timeEnd || "08:30")},\n`;
-    s += `    courses: [\n`;
-    for (let j = 0; j < yr.courses.length; j++) {
-      const c = { ...yr.courses[j] };
-      delete c._previewPoster;  // 不匯出記憶體預覽
-      s += `      ${courseToLine(c)}${j < yr.courses.length-1 ? "," : ""}\n`;
-    }
-    s += `    ]\n`;
-    s += `  }${i < years.length-1 ? "," : ""}\n`;
+function buildWordRow(c) {
+  const dateCell = `<td class="date-cell">${escapeHtml(c.date)}<br>(${escapeHtml(c.weekday || "")})</td>`;
+  if (c.status === "cancelled") {
+    return `<tr>${dateCell}<td colspan="3" class="cancelled">本次暫停（${escapeHtml(c.topic || "取消")}）</td></tr>`;
   }
-  s += "};";
-  return s;
-}
-
-function courseToLine(c) {
-  const order = ["date","weekday","status","topic","speaker","host","timeStart","timeEnd","note","poster","tags","details","special"];
-  const parts = [];
-  for (const k of order) {
-    if (c[k] === undefined || c[k] === null) continue;
-    if (Array.isArray(c[k])) {
-      if (c[k].length === 0) continue;
-      parts.push(`${k}:[${c[k].map(v => JSON.stringify(v)).join(",")}]`);
-    } else if (typeof c[k] === "string" && c[k] === "") {
-      continue;
-    } else {
-      parts.push(`${k}:${JSON.stringify(c[k])}`);
-    }
+  if (c.status === "holiday") {
+    return `<tr>${dateCell}<td colspan="3" class="holiday">${escapeHtml(c.note || c.topic || "假期暫停")}</td></tr>`;
   }
-  // 其他未列在 order 的欄位也保留
-  for (const [k, v] of Object.entries(c)) {
-    if (order.includes(k) || k === "_previewPoster") continue;
-    parts.push(`${k}:${JSON.stringify(v)}`);
+  if (c.status === "tba") {
+    return `<tr>${dateCell}<td colspan="3" class="tba">主題待公告</td></tr>`;
   }
-  return `{ ${parts.join(", ")} }`;
+  // 主資料列
+  let html = `<tr>
+    ${dateCell}
+    <td class="topic-cell">${escapeHtml(c.topic || "")}${c.note ? `<br><span style="color:#666;font-size:9.5pt">備註：${escapeHtml(c.note)}</span>` : ""}</td>
+    <td>${escapeHtml(c.speaker || "").replace(/／|\//g, "<br>")}</td>
+    <td>${escapeHtml(c.host || "").replace(/／|\//g, "<br>")}</td>
+  </tr>`;
+  // 學分明細列
+  if (c.details && c.details.length) {
+    html += `<tr class="credit-row"><td colspan="4">
+      ${c.details.map(d => `<p>＊${escapeHtml(d)}</p>`).join("")}
+    </td></tr>`;
+  }
+  return html;
 }
 
 /* =========================================================
