@@ -1873,7 +1873,7 @@ function buildVEvent(course, twYear) {
     course.details.forEach(d => descLines.push(`• ${d}`));
   }
   if (course.note) descLines.push(`備註：${course.note}`);
-  const description = descLines.join("\\n");
+  const description = descLines.join("\n");
 
   const lines = [
     "BEGIN:VEVENT",
