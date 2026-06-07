@@ -774,9 +774,10 @@
   }
   body.admin-mode .card-admin-actions { display: flex; }
   .btn-card-mini {
-    font-size: 12px; padding: 5px 14px; border-radius: 6px;
+    font-size: 12px; padding: 6px 18px; border-radius: 6px;
     border: 1px solid; cursor: pointer; font-family: inherit;
-    font-weight: 600; display: inline-flex; align-items: center; gap: 5px;
+    font-weight: 600; min-width: 64px;
+    display: inline-flex; align-items: center; justify-content: center;
     transition: all 0.15s; white-space: nowrap;
   }
   .btn-card-edit { background: var(--primary-light); color: var(--primary-dark); border-color: #b6dde5; }
@@ -1704,14 +1705,8 @@ function buildCard(c, idx, showYear) {
 
   if (isAdmin) {
     html += `<div class="card-admin-actions">
-      <button class="btn-card-mini btn-card-edit" data-edit-idx="${idx}">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-        編輯
-      </button>
-      <button class="btn-card-mini btn-card-del" data-del-idx="${idx}">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a2 2 0 012-2h2a2 2 0 012 2v3"/></svg>
-        刪除
-      </button>
+      <button class="btn-card-mini btn-card-edit" data-edit-idx="${idx}">編輯</button>
+      <button class="btn-card-mini btn-card-del" data-del-idx="${idx}">刪除</button>
     </div>`;
   }
 
