@@ -2244,6 +2244,7 @@ async function attemptLogin(e) {
     $("login-user").value = "";
     $("login-pass").value = "";
     showToast(displayName ? `已登入：${displayName}` : "已登入管理者模式");
+    renderYearTabs();   // 重新渲染 tab，讓管理者也能看到尚未公告的年度
     render();
   } else {
     $("login-error").textContent = "❌ 帳號或密碼錯誤";
@@ -2264,6 +2265,7 @@ $("btn-logout").addEventListener("click", () => {
   document.body.classList.remove("admin-mode");
   $("admin-toolbar").classList.remove("show");
   showToast("已登出");
+  renderYearTabs();   // 重新渲染 tab，回到公開版
   render();
 });
 
