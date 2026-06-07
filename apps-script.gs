@@ -249,11 +249,29 @@ function formatDateCell_(headerName, d) {
 
 // ============ 驗證 ============
 
+// 把 stored 值正規化成 SHA-256 雜湊：
+// - 若已是 64 字元 hex → 直接回傳
+// - 否則視為明文密碼，計算其雜湊後回傳
+function normalizeAuthValue_(stored) {
+  const s = String(stored).trim().toLowerCase();
+  if (/^[a-f0-9]{64}$/.test(s)) return s;
+  return sha256Hex_(String(stored).trim());
+}
+
+function sha256Hex_(input) {
+  const bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, input, Utilities.Charset.UTF_8);
+  return bytes.map(b => {
+    const v = (b < 0 ? b + 256 : b).toString(16);
+    return v.length === 1 ? "0" + v : v;
+  }).join("");
+}
+
 function login(passwordHash) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   ensureSheet_(ss, SHEET_NAMES.AUTH);
   const auth = sheetToObjects(ss.getSheetByName(SHEET_NAMES.AUTH));
-  const found = auth.find(a => String(a.passwordHash).toLowerCase() === String(passwordHash).toLowerCase());
+  const input = String(passwordHash).toLowerCase();
+  const found = auth.find(a => normalizeAuthValue_(a.passwordHash) === input);
   if (!found) throw new Error("帳號或密碼錯誤");
   return { username: found.username, displayName: found.displayName || "" };
 }
@@ -262,7 +280,8 @@ function checkAuth(passwordHash) {
   if (!passwordHash) return false;
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const auth = sheetToObjects(ss.getSheetByName(SHEET_NAMES.AUTH));
-  return auth.some(a => String(a.passwordHash).toLowerCase() === String(passwordHash).toLowerCase());
+  const input = String(passwordHash).toLowerCase();
+  return auth.some(a => normalizeAuthValue_(a.passwordHash) === input);
 }
 
 // ============ 寫入：課程 ============
