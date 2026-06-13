@@ -2349,6 +2349,14 @@ async function sha256Hex(text) {
   return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
+/* 計算今天的民國日期字串 (115.06.13 格式) */
+function todayTwDateStr() {
+  const now = new Date();
+  return (now.getFullYear() - 1911) + "." +
+         String(now.getMonth() + 1).padStart(2, "0") + "." +
+         String(now.getDate()).padStart(2, "0");
+}
+
 /* =========================================================
  * Google Sheet API 助手
  * ========================================================= */
@@ -2765,6 +2773,8 @@ async function saveCourseEdit() {
       delete payload._previewPoster; // 不傳上 Sheet
       const saved = await callApi("saveCourse", { course: payload, passwordHash: sessionPasswordHash });
       if (saved && saved.id) course.id = saved.id;
+      // Apps Script 已自動更新 Years.updated，同步本地記憶體免等背景刷新
+      if (SCHEDULE[year]) SCHEDULE[year].updated = todayTwDateStr();
     } catch (e) {
       showToast("❌ 儲存失敗：" + e.message);
       return;
@@ -2808,6 +2818,8 @@ async function deleteCourse(year, idx) {
     try {
       showToast("刪除中…");
       await callApi("deleteCourse", { id: c.id, passwordHash: sessionPasswordHash });
+      // Apps Script 已同步更新 Years.updated，本地記憶體也跟著同步
+      if (SCHEDULE[year]) SCHEDULE[year].updated = todayTwDateStr();
     } catch (e) {
       showToast("❌ 刪除失敗：" + e.message);
       return;
