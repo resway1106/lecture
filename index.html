@@ -35,37 +35,36 @@
   }
   body {
     font-family: 'Noto Sans TC', system-ui, -apple-system, "Microsoft JhengHei", sans-serif;
-    background: linear-gradient(135deg, #f0f9fb 0%, #fdf6f1 100%);
+    /* 垂直漸層：頂部 cream 與 Hero 底色完全一致，避免邊線 */
+    background: linear-gradient(180deg, #fdf6f1 0%, #f5f1ed 40%, #fdf6f1 100%);
     color: var(--gray-900);
     min-height: 100vh;
     line-height: 1.6;
   }
   .container { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
 
-  /* Header — 晨光天空漸層：上方青綠夜空 → 中段過渡 → 下方暖夕陽
-     padding-bottom 給足空間：避免年度按鈕被 Spotlight 重疊區擋到 */
+  /* Header — 晨光天空漸層：上方青綠夜空 → 中段過渡 → 底部完全融入頁面背景 */
   header {
     background: linear-gradient(180deg,
       #0d7d92 0%,        /* 天頂青綠 */
-      #1a8fa3 30%,
-      #4ba8b3 60%,
-      #d8a578 90%,       /* 地平線暖橘 */
-      #f0d3b0 100%);     /* 底部與頁面背景 #fdf6f1 較接近，避免硬線 */
+      #1a8fa3 28%,
+      #4ba8b3 55%,
+      #d8a578 80%,       /* 地平線暖橘 */
+      #fdf6f1 100%);     /* 底部 = 頁面背景色 #fdf6f1，徹底消除邊線 */
     color: #fff;
     padding: 40px 0 70px;
     position: relative;
     overflow: hidden;
   }
-  /* 底部與頁面背景銜接漸層，徹底消除硬邊線 */
+  /* 底部與頁面背景無縫銜接 (cream → cream，看不到邊界) */
   header > .hero-bottom-fade {
     position: absolute;
     bottom: 0; left: 0; right: 0;
-    height: 24px;
+    height: 40px;
     background: linear-gradient(to bottom,
                   transparent 0%,
-                  rgba(253, 246, 241, 0.4) 60%,
-                  rgba(253, 246, 241, 0.85) 100%);
-    pointer-events: none; z-index: 2;
+                  #fdf6f1 100%);
+    pointer-events: none; z-index: 3;
   }
   /* 右下太陽光暈 — 強化「晨光照亮建築」的方向感 */
   header::before {
@@ -87,14 +86,15 @@
   }
   .header-content { position: relative; z-index: 3; }
 
-  /* 奇美醫院建築 - 右側建築群，自然採光感 */
+  /* 奇美醫院建築 - 右側建築群，底邊貼齊 Spotlight 上緣 */
   .hero-buildings {
     position: absolute;
-    bottom: 0; right: 0;
+    bottom: 34px;           /* 抬升 ≈ Spotlight 重疊量 (36px - 微調)，建築底邊貼齊 Spotlight 上方 */
+    right: 0;
     width: 56%;
     max-width: 760px;
     height: auto;
-    max-height: 220px;       /* 增加可視範圍，避免被 Spotlight 重疊區裁切過多 */
+    max-height: 260px;      /* 高度加大，讓建築群更顯氣勢 */
     object-fit: cover;
     object-position: bottom right;
     opacity: 0.78;            /* 提高 → 建築清晰，背景已是暖色不會搶戲 */
