@@ -46,7 +46,7 @@
   header {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     color: #fff;
-    padding: 40px 0 80px;
+    padding: 40px 0 120px;
     position: relative;
     overflow: hidden;
   }
@@ -62,7 +62,42 @@
     background: radial-gradient(circle, rgba(217,119,87,0.15) 0%, transparent 70%);
     border-radius: 50%;
   }
-  .header-content { position: relative; z-index: 1; }
+  .header-content { position: relative; z-index: 2; }
+
+  /* 奇美醫院建築剪影 - Hero 底部裝飾 */
+  .hero-buildings {
+    position: absolute;
+    bottom: -2px;       /* 貼齊 header 底邊 (避免 sub-pixel 縫隙) */
+    left: 0; right: 0;
+    width: 100%;
+    height: auto;
+    max-height: 240px;
+    object-fit: cover;
+    object-position: bottom center;
+    opacity: 0.32;
+    pointer-events: none;
+    z-index: 1;
+    filter: brightness(1.35) saturate(0.45) contrast(0.92);
+    -webkit-mask-image: linear-gradient(to top,
+                          rgba(0,0,0,1) 35%,
+                          rgba(0,0,0,0.7) 65%,
+                          rgba(0,0,0,0.2) 88%,
+                          rgba(0,0,0,0) 100%);
+    mask-image: linear-gradient(to top,
+                  rgba(0,0,0,1) 35%,
+                  rgba(0,0,0,0.7) 65%,
+                  rgba(0,0,0,0.2) 88%,
+                  rgba(0,0,0,0) 100%);
+  }
+  /* 底部漸層發光：讓建築與下方留白區自然銜接 */
+  .hero-glow {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 80px;
+    background: linear-gradient(to top, rgba(255,255,255,0.06) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
   .brand-row {
     display: flex; align-items: center; gap: 14px;
     margin-bottom: 18px;
@@ -987,6 +1022,8 @@
 </div>
 
 <header>
+  <img class="hero-buildings" src="buliding_cmh.png" alt="" aria-hidden="true" />
+  <div class="hero-glow"></div>
   <div class="container header-content">
     <div class="brand-row">
       <img src="logo.png" alt="奇美醫院 教學部" class="brand-logo" />
