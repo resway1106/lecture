@@ -43,18 +43,29 @@
   .container { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
 
   /* Header — 晨光天空漸層：上方青綠夜空 → 中段過渡 → 下方暖夕陽
-     padding-bottom 縮減為 16px，讓 Hero 整體精簡，建築貼齊年度 tab 底邊 */
+     padding-bottom 給足空間：避免年度按鈕被 Spotlight 重疊區擋到 */
   header {
     background: linear-gradient(180deg,
       #0d7d92 0%,        /* 天頂青綠 */
       #1a8fa3 30%,
       #4ba8b3 60%,
       #d8a578 90%,       /* 地平線暖橘 */
-      #e8b889 100%);     /* 底部暖光 */
+      #f0d3b0 100%);     /* 底部與頁面背景 #fdf6f1 較接近，避免硬線 */
     color: #fff;
-    padding: 40px 0 16px;
+    padding: 40px 0 70px;
     position: relative;
     overflow: hidden;
+  }
+  /* 底部與頁面背景銜接漸層，徹底消除硬邊線 */
+  header > .hero-bottom-fade {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 24px;
+    background: linear-gradient(to bottom,
+                  transparent 0%,
+                  rgba(253, 246, 241, 0.4) 60%,
+                  rgba(253, 246, 241, 0.85) 100%);
+    pointer-events: none; z-index: 2;
   }
   /* 右下太陽光暈 — 強化「晨光照亮建築」的方向感 */
   header::before {
@@ -83,7 +94,7 @@
     width: 56%;
     max-width: 760px;
     height: auto;
-    max-height: 200px;       /* 縮減後與年度 tab 底邊對齊 */
+    max-height: 220px;       /* 增加可視範圍，避免被 Spotlight 重疊區裁切過多 */
     object-fit: cover;
     object-position: bottom right;
     opacity: 0.78;            /* 提高 → 建築清晰，背景已是暖色不會搶戲 */
@@ -1049,6 +1060,7 @@
 <header>
   <img class="hero-buildings" src="buliding_cmh.png" alt="" aria-hidden="true" />
   <div class="hero-glow"></div>
+  <div class="hero-bottom-fade"></div>
   <div class="container header-content">
     <div class="brand-row">
       <img src="logo.png" alt="奇美醫院 教學部" class="brand-logo" />
